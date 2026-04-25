@@ -10,9 +10,7 @@ There are a few ways to get the backend and frontend services deployed. If you'r
 
 ## Docker Compose
 
-```yaml
-# compose.yaml
-
+```yaml [compose.yaml]
 services:
   # backend service
   caby-service:
@@ -44,8 +42,8 @@ volumes:
 
 ## Docker CLI
 
-```bash
-# caby-service
+Run the background service in the background:
+```sh
 docker run -d \
   --name caby-service \
   -p 8080:8080 \
@@ -53,8 +51,10 @@ docker run -d \
   -v "$(pwd)/config.yaml:/app/cabynet/config.yaml:ro" \
   --restart unless-stopped \
   cabynet/caby-service:latest
+```
 
-# caby-web
+Run the frontend service in the background:
+```sh
 docker run -d \
   --name caby-web \
   -p 3000:3000 \

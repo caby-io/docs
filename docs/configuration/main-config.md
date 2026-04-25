@@ -28,8 +28,6 @@ The main config file is in active development and unstable at the moment. Some o
 :::
 
 ```yaml [config.yaml]
-# config.yaml
-
 spaces:
     # a unique name for the space that determines the path on the filesystem
     # (e.g. 'home' -> 'cabynet/spaces/home')
