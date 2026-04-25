@@ -1,3 +1,5 @@
 # Kubernetes
 
-TODO: Deploying Caby with kubectl. Easily adaptable to tools like Kustomize.
+:::info TODO
+Just gotta do it
+:::

@@ -1,7 +1,6 @@
 # What is Caby?
 
-:::info
-TODO
+:::info TODO
 - What caby is
 - Why caby exists
 - Why having a super-stable and reliable file manager is important
