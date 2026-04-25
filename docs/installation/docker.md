@@ -4,7 +4,7 @@ To get Caby running we need three things:
 
 1. The backend service
 2. The frontend service
-3. A valid config file
+3. A valid [config file](../configuration/main-config.md)
 
 There are a few ways to get the backend and frontend services deployed. If you're not sure which to use we recommend starting with [Docker Compose](#docker-compose).
 
