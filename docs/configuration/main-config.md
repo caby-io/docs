@@ -20,7 +20,7 @@ onMounted(() => {
 
 You'll need to configure spaces and users:
 
-- Spaces represent compartments of files to help your organize by purpose or access.
+- Spaces represent compartments of files to help you organize by purpose or access.
 - Users, of course, help us give people access to those spaces.
 
 :::warning

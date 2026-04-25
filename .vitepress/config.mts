@@ -41,15 +41,6 @@ export default defineConfig({
           ],
         },
       ],
-      "/": [
-        {
-          text: "TODO: Remove",
-          items: [
-            { text: "Markdown Examples", link: "/markdown-examples" },
-            { text: "Runtime API Examples", link: "/api-examples" },
-          ],
-        },
-      ],
     },
 
     socialLinks: [{ icon: "github", link: "https://github.com/caby-io" }],

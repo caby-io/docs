@@ -20,7 +20,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      # this is where everything: Files, users, shares, will be saved
+      # everything (files, users, shares, ...) is saved here
       - cabynet:/app/cabynet
       # the main configuration. Caby only needs read access to this
       - ./config.yaml:/app/cabynet/config.yaml:ro
@@ -42,7 +42,8 @@ volumes:
 
 ## Docker CLI
 
-Run the background service in the background:
+Run the backend service in the background:
+
 ```sh
 docker run -d \
   --name caby-service \
@@ -54,6 +55,7 @@ docker run -d \
 ```
 
 Run the frontend service in the background:
+
 ```sh
 docker run -d \
   --name caby-web \
