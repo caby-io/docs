@@ -22,7 +22,7 @@ features:
     icon: ⚓
     details: Caby is a simple and reliable bedrock for your self-hosted stack. Spend less time maintaining your home lab and more time actually using it.
     linkText: How we achieve this
-    link: /docs/design-why
+    link: /docs/what-is-caby
     target: _self
   - title: Own Your Data
     icon: 🏠
