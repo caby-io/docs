@@ -45,7 +45,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: "github", link: "https://github.com/caby-io" },
+      { icon: "github", link: "https://github.com/caby-io/caby" },
       { icon: "discord", link: "https://discord.gg/Z2JkSs2Hzy" },
     ],
   },

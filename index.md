@@ -12,7 +12,7 @@ hero:
       link: /docs/overview
     - theme: alt
       text: Caby on Github
-      link: https://github.com/caby-io
+      link: https://github.com/caby-io/caby
 
 features:
   - title: Fast & Efficient
