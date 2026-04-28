@@ -14,7 +14,7 @@ There are a few ways to get the backend and frontend services deployed. If you'r
 services:
   # backend service
   caby-service:
-    image: cabynet/caby-service:latest
+    image: ghcr.io/caby-io/caby-service:edge
     # keep the backend in a startup loop while we prep the config
     restart: unless-stopped
     ports:
@@ -27,7 +27,7 @@ services:
 
   # frontend service
   caby-web:
-    image: cabynet/caby-web:latest
+    image: ghcr.io/caby-io/caby-web:edge
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -51,7 +51,7 @@ docker run -d \
   -v "$(pwd)/cabynet:/app/cabynet" \
   -v "$(pwd)/config.yaml:/app/cabynet/config.yaml:ro" \
   --restart unless-stopped \
-  cabynet/caby-service:latest
+  ghcr.io/caby-io/caby-service:edge
 ```
 
 Run the frontend service in the background:
@@ -62,5 +62,5 @@ docker run -d \
   -p 3000:3000 \
   -e PUBLIC_API_BASE=http://localhost:8080/v0 \
   --restart unless-stopped \
-  cabynet/caby-web:latest
+  ghcr.io/caby-io/caby-web:edge
 ```
