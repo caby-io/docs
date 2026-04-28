@@ -19,7 +19,7 @@ features:
     icon: ⚡
     details: Caby respects your hardware budget and constraints. Built with 🦀 <span class="bold color-rust">Rust</span> and 🔥 <span class="bold color-svelte">Svelte</span> to pack a punch with a small footprint.
   - title: Resilient
-    icon: ⚓
+    icon: 🏛️
     details: Caby is a simple and reliable bedrock for your self-hosted stack. Spend less time maintaining your home lab and more time actually using it.
     linkText: How we achieve this
     link: /docs/what-is-caby
