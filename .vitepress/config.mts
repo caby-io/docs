@@ -6,7 +6,7 @@ import {
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "Caby",
+  title: "caby.io",
   description: "Caby — A self-hosted file management app",
   markdown: {
     config(md) {
@@ -16,11 +16,12 @@ export default defineConfig({
   vite: {
     plugins: [groupIconVitePlugin()],
   },
+  appearance: 'dark',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: "Home", link: "/" },
-      { text: "Documentation", link: "/docs" },
+      { text: "Documentation", link: "/docs/overview" },
     ],
 
     sidebar: {
@@ -43,6 +44,9 @@ export default defineConfig({
       ],
     },
 
-    socialLinks: [{ icon: "github", link: "https://github.com/caby-io" }],
+    socialLinks: [
+      { icon: "github", link: "https://github.com/caby-io" },
+      { icon: "discord", link: "https://discord.gg/Z2JkSs2Hzy" },
+    ],
   },
 });
