@@ -86,7 +86,7 @@ volumes:
 
 ### Prepare Caby's config
 
-For `compose.yaml` reference the [config file](../configuration/main-config.md) page.
+For `config.yaml` reference the [config file](../configuration/main-config.md) page.
 
 ### Deploy
 
