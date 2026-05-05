@@ -8,6 +8,10 @@ import {
 export default defineConfig({
   title: "caby.io",
   description: "Caby — A self-hosted file management app",
+  head: [
+    ["link", { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }],
+    ["link", { rel: "icon", type: "image/png", href: "/favicon.png" }],
+  ],
   markdown: {
     config(md) {
       md.use(groupIconMdPlugin);
@@ -19,6 +23,11 @@ export default defineConfig({
   appearance: 'dark',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
+    logo: {
+      light: "/caby-logo-light.svg",
+      dark: "/caby-logo-dark.svg",
+    },
+    siteTitle: false,
     outline: [2, 3],
 
     nav: [
