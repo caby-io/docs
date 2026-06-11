@@ -1,0 +1,75 @@
+---
+title: Main Config
+description: Configure Caby's spaces and users in the main config file.
+---
+
+import { Badge } from '@astrojs/starlight/components';
+import RandomizeTokens from '../../../components/RandomizeTokens.astro';
+
+<RandomizeTokens />
+
+You'll need to configure spaces and users:
+
+- Spaces represent compartments of files to help you organize by purpose or access.
+- Users, of course, help us give people access to those spaces.
+
+:::caution
+The main config file is in active development and unstable at the moment. Some of these fields don't do anything and others will likely move or be renamed. Keep an eye on this page between updates to stay on top of those changes.
+:::
+
+```yaml title="config.yaml"
+urls:
+  # URL of the backend service
+  # exclude the api version (e.g. '/v0')
+  backend: https://files-api.my-domain.com
+  # URL of the frontend
+  frontend: https://files.my-domain.com
+
+spaces:
+    # a unique name for the space that determines the path on the filesystem
+    # (e.g. 'home' -> 'cabynet/spaces/home')
+  - name: home
+    # overrides how the space is displayed in the UI; can include emojis
+    display: "🏠 Home"
+    # note how only the name is required for a space
+  - name: media
+
+users:
+    # the username of the user; functions like an ID so it needs to be unique
+    # for each user
+  - name: caby_guy
+    # an optional email for the user
+    email: caby_guy@caby.io
+    # 64-character string used to activate the user's account on first login;
+    # generate a unique random token per user (do not reuse this example)
+    activation_token: REPLACE_WITH_A_UNIQUE_64_CHARACTER_TOKEN
+    # the spaces this user should have access to
+    spaces:
+      - name: home
+        permissions: "*"
+```
+
+## OIDC/SSO Config
+
+Caby works with most OpenID Connect 1.0 providers: Keycloak, Authentik, PocketID, and more. For most setups you need just three things:
+
+- The OIDC provider's URL,
+- A client ID, and
+- A client secret
+
+Once you have these three pieces, add them to your config file:
+
+```yaml title="config.yaml"
+#...
+auth:
+  oidc:
+    issuer_url: "https://auth.my-domain.com"
+    client_id: "OIDC_CLIENT_ID"
+    client_secret: "OIDC_CLIENT_SECRET"
+#...
+```
+
+### Manual OIDC config <Badge text="TODO" variant="caution" />
+
+:::caution[Coming soon]
+:::

@@ -1,0 +1,46 @@
+---
+title: Badge demo
+description: Throwaway page to preview Starlight badges. Safe to delete.
+tableOfContents: false
+---
+
+import { Badge } from '@astrojs/starlight/components';
+
+Throwaway preview page — not linked in the sidebar. Delete `src/content/docs/badge-demo.mdx` when done.
+
+## Variants (default size)
+
+<p>
+  <Badge text="note" variant="note" />{' '}
+  <Badge text="tip" variant="tip" />{' '}
+  <Badge text="caution" variant="caution" />{' '}
+  <Badge text="danger" variant="danger" />{' '}
+  <Badge text="success" variant="success" />{' '}
+  <Badge text="default" variant="default" />
+</p>
+
+## Sizes (caution variant)
+
+<p>
+  <Badge text="small" variant="caution" size="small" />{' '}
+  <Badge text="medium" variant="caution" size="medium" />{' '}
+  <Badge text="large" variant="caution" size="large" />
+</p>
+
+## Inline next to a heading
+
+### OIDC configuration <Badge text="WIP" variant="caution" />
+
+### Helm chart <Badge text="Coming soon" variant="note" />
+
+### Stable API <Badge text="New" variant="success" size="small" />
+
+## As a "TODO" marker (reader-facing)
+
+### Manual OIDC config <Badge text="TODO" variant="caution" />
+
+Versus an aside, for comparison:
+
+:::caution[Coming soon]
+Manual OIDC configuration docs are in progress.
+:::
