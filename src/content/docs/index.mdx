@@ -1,0 +1,34 @@
+---
+title: Caby
+description: A self-hosted file management app
+template: splash
+hero:
+  tagline: Self-Hosted File Management
+  image:
+    html: '<img src="/screenshot.webp" alt="The Caby web interface showing a media space with directories and files" style="width: 100%; height: auto; border-radius: 0.5rem; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);" />'
+  actions:
+    - text: Get Started
+      link: /getting-started
+      icon: right-arrow
+    - text: Caby on GitHub
+      link: https://github.com/caby-io/caby
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid>
+  <Card title="Fast & Efficient" icon="rocket">
+    Caby respects your hardware budget and constraints. Built with Rust and
+    Svelte to pack a punch with a small footprint.
+  </Card>
+  <Card title="Resilient" icon="approve-check">
+    A simple and reliable bedrock for your self-hosted stack. Spend less time
+    maintaining your home lab and more time actually using it.
+  </Card>
+  <Card title="Own Your Data" icon="open-book">
+    Start owning your digital data: documents, photos, files — all of it. Caby
+    will get you started.
+  </Card>
+</CardGrid>

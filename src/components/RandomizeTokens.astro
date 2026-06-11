@@ -1,0 +1,43 @@
+---
+/**
+ * Replaces the activation-token placeholder in the page's code blocks with a
+ * freshly generated random 64-character token on every load — so visitors don't
+ * all copy the same example token across their Caby instances.
+ *
+ * Ported from the old VitePress `<script setup>`. Pure vanilla JS (no framework);
+ * Astro bundles the script below and only ships it on pages that use this component.
+ *
+ * Usage: drop `<RandomizeTokens />` anywhere on a page whose code contains the
+ * placeholder string below. The no-JS fallback is the placeholder text itself.
+ */
+---
+
+<script>
+  const PLACEHOLDER = 'REPLACE_WITH_A_UNIQUE_64_CHARACTER_TOKEN';
+  const CHARS =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  function randomToken(length = 64) {
+    const values = crypto.getRandomValues(new Uint32Array(length));
+    let token = '';
+    for (let i = 0; i < length; i++) token += CHARS[values[i] % CHARS.length];
+    return token;
+  }
+
+  function randomizeTokens() {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const targets = [];
+    let node;
+    while ((node = walker.nextNode())) {
+      if (node.nodeValue && node.nodeValue.includes(PLACEHOLDER)) targets.push(node);
+    }
+    // Replace each occurrence with its own unique token.
+    for (const target of targets) {
+      target.nodeValue = target.nodeValue.replaceAll(PLACEHOLDER, () => randomToken());
+    }
+  }
+
+  randomizeTokens();
+  // Re-run if Starlight ever navigates via view transitions (harmless otherwise).
+  document.addEventListener('astro:page-load', randomizeTokens);
+</script>

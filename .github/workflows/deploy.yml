@@ -29,13 +29,13 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm docs:build
+      - run: pnpm build
 
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .vitepress/dist
+          path: dist
 
   deploy:
     needs: build

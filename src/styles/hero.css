@@ -1,0 +1,48 @@
+/* Home splash hero (has a hero image, no sidebar): let the product screenshot
+   show larger than Starlight's default 25rem cap and share the row more evenly
+   with the copy. */
+@media (min-width: 50rem) {
+  [data-has-hero]:not([data-has-sidebar]) .hero {
+    grid-template-columns: 5fr 6fr;
+  }
+
+  [data-has-hero]:not([data-has-sidebar]) .hero > .hero-html {
+    width: 100%;
+    max-width: 42rem;
+  }
+}
+
+/* Doc-page hero (hero + sidebar, e.g. Getting Started): there's no image, so
+   drop Starlight's reserved image column and the 50ch copy cap and let the
+   title / tagline / actions span the full (widened) content column. */
+[data-has-hero][data-has-sidebar] .hero {
+  grid-template-columns: 1fr;
+}
+
+[data-has-hero][data-has-sidebar] .hero .copy > * {
+  max-width: none;
+}
+
+/* Faint grid texture across the whole page background, fading out from the
+   top-right corner — borrowed from the Astro docs hero, applied page-wide.
+   Fixed + z-index:-1 paints above the page background but behind all content. */
+[data-has-hero][data-has-sidebar] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--sl-color-white) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--sl-color-white) 1px, transparent 1px);
+  background-size: 23px 23px;
+  -webkit-mask-image: radial-gradient(circle at 100% 0%, white, transparent 65%);
+  mask-image: radial-gradient(circle at 100% 0%, white, transparent 65%);
+  opacity: 0.05;
+}
+
+/* Astro's docs hero tagline is a plain paragraph (~1rem); Starlight's default
+   scales up to --sl-text-xl. Match the smaller size on this doc hero. */
+[data-has-hero][data-has-sidebar] .hero .tagline {
+  font-size: var(--sl-text-base);
+}
