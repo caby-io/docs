@@ -17,7 +17,7 @@ hero:
 
 import { CardGrid } from '@astrojs/starlight/components';
 import DeployCard from '../../components/DeployCard.astro';
-import { docker, kubernetes } from '../../components/brand-icons';
+import { docker, kubernetes, helm } from '../../components/brand-icons';
 
 ## Deployment Options
 
@@ -28,5 +28,8 @@ import { docker, kubernetes } from '../../components/brand-icons';
   </DeployCard>
   <DeployCard title="Kubernetes" accentColor="#326CE5" accentTint="rgba(50, 108, 229, 0.2)" iconPath={kubernetes}>
     - [Deploy with Kubernetes](/installation/kubernetes)
+  </DeployCard>
+  <DeployCard title="Helm" accentColor="#0F1689" accentTint="rgba(15, 22, 137, 0.2)" iconPath={helm}>
+    - [Deploy with Helm](/installation/helm)
   </DeployCard>
 </CardGrid>
