@@ -29,7 +29,6 @@ export const isGroup = (item: NavItem): item is NavGroup =>
 // top-level entries mix freely: a bare link renders flat (uncategorised), a group
 // renders as a static bold section header, a nested group renders collapsible.
 export const sidebar: NavItem[] = [
-  // { label: 'Discussion', link: '/discussion' },  // e.g. a flat top-level link
   {
     label: "Welcome",
     items: [

@@ -167,7 +167,7 @@ import Icon from "./Icon.astro";
       var(--sl-color-bg-nav) 85%,
       transparent
     );
-    backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--nav-blur));
     color: var(--sl-color-text);
     box-shadow: var(--box-shadow-0);
     overflow: hidden;
@@ -202,6 +202,12 @@ import Icon from "./Icon.astro";
     font: inherit;
     font-size: var(--sl-text-base);
     outline: none;
+    appearance: none;
+  }
+  #search-input::-webkit-search-cancel-button,
+  #search-input::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
   }
   .box-close {
     display: inline-flex;
@@ -234,6 +240,12 @@ import Icon from "./Icon.astro";
     padding: 0.5rem;
     scrollbar-width: thin;
     scrollbar-color: var(--sl-color-gray-5) transparent;
+  }
+  .search-results:has(.search-note) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 10rem;
   }
   .search-result {
     display: flex;

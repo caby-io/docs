@@ -1,21 +1,36 @@
 ---
 title: What is Caby?
-description: Learn what Caby is, where its headed, and whether it aligns with your needs.
+# description: Learn what Caby is, where it's headed, and whether it aligns with your needs.
 ---
 
-Caby is an opinionated take on what self-hosted file management should be. These can be described in 3 major themes:
+<Lede>
+  Caby's goal is to be part of making self-hosting accessible to everyone. To this end we've taken an opinionated approach to self-hosting that revolves around three themes:
 
-- Reliability: Should be the most reliable service in your stack,
-- Performance: Caby should be fast,
-- Focus:
+  - <Icon name="lucide:brick-wall" class="inline-icon icon-green" /> **Reliability**: File management should be the most reliable part of your stack.
+  - <Icon name="lucide:zap" class="inline-icon icon-orange" /> **Performance**: The file management app or stack should be fast and efficient.
+  - <Icon name="lucide:target" class="inline-icon icon-blue" /> **Focus**: The file manager should have a defined role and scope.
+</Lede>
 
-<Aside type="caution">...</Aside>
+### Design Decisions
 
-:::caution
+Here are some examples of design decisions from these principles:
 
-- What caby is
-- Why caby exists
-- Why having a super-stable and reliable file manager is important
-- How caby addresses resiliency: No backing services, everything is a file, etc.
+- **Simple, Flat Files:**
 
-:::
+  Users' files are stored as they're sent. Storing plain files maximizes compatibility with other self-hosted apps or tools and works well with most home server infrastructure.
+
+- **No Backing Services:**
+
+  Caby's app state is held in plain files without the need for backing services (e.g. databases, caches, etc.). This reduces the blast-radius of corruption and makes it easy for a human (or their agent) to fix things when system data gets into a bad state.
+
+- **Built-In Auth -> OIDC:**
+
+  Caby's built-in simple auth system is good enough for most light use-cases. For setups that require managing many users and roles, we actively steer admins towards delegating these requirements to an OIDC provider.
+
+- **Built-In Monitoring & Self-Healing:** (in-progress)
+
+  Caby runs background tasks that scan for issues and attempt to fix them automatically. If Caby can't resolve the problem itself, it surfaces it to the admin or user to step in as early as possible.
+
+- **Data Safety:** (in-progress)
+
+  Caby will ensure that information is not lost. For example, the file versioning and write queueing system will store two simultaneous changes to a file's history instead of just the last.

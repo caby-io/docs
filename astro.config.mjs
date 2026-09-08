@@ -30,8 +30,7 @@ export default defineConfig({
   vite: {
     // WSL2's inotify drops file-change events; polling keeps the dev watcher reliable.
     server: { watch: { usePolling: true } },
-    // lightningcss minifies and autoprefixes (e.g. -webkit-backdrop-filter for Safari) off
-    // cssTarget; esbuild's minifier instead strips the unprefixed rule, killing blur in Firefox.
+    // lightningcss (not esbuild) so backdrop-filter gets autoprefixed for Safari, not stripped
     build: {
       cssMinify: "lightningcss",
       cssTarget: ["chrome111", "firefox113", "safari16"],

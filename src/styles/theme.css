@@ -71,7 +71,6 @@
      shared by expressive code and file trees */
   --glass-blur: 2px;
   --code-bg: color-mix(in oklab, var(--sl-color-bg-nav) 10%, transparent);
-  --code-header-bg: color-mix(in oklab, var(--code-bg), #000 28%);
   --code-border: var(--clr-border);
   --code-radius: 0.5rem;
 
@@ -87,7 +86,6 @@
 :root[data-theme="dark"] {
   --sl-color-bg: oklch(12.36% 0.013 273.36);
   --sl-color-bg-nav: oklch(15.36% 0.013 273.36);
-  --sl-color-bg-sidebar: oklch(15.36% 0.013 273.36);
 }
 
 :root[data-theme="light"] {

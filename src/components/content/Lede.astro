@@ -1,0 +1,18 @@
+---
+// opt-in: wraps a page's opening summary so it reads larger than the body.
+// most pages don't need this — only use it on intro/overview-style content.
+---
+
+<div class="lede"><slot /></div>
+
+<style>
+  .lede {
+    font-size: var(--sl-text-lg);
+  }
+  .lede :global(> * + *) {
+    margin-top: 1rem;
+  }
+  .lede :global(li + li) {
+    margin-top: 0.5rem;
+  }
+</style>

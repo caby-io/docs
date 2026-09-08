@@ -67,7 +67,7 @@ a {
   margin-top: 1rem;
 }
 .prose li > * + * {
-  margin-top: 0.85rem;
+  margin-top: 0.35rem;
 }
 
 .prose :is(h1, h2, h3, h4, h5) {
@@ -101,10 +101,29 @@ a {
   padding-inline-start: 1.25rem;
 }
 .prose li + li {
-  margin-top: 0.35rem;
+  margin-top: 0.85rem;
 }
 .prose li > :is(ul, ol) {
   margin-top: 0.35rem;
+}
+
+/* small emoji-like glyph inline before a list item / word */
+.prose .inline-icon {
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  margin-inline-end: 0.35em;
+  vertical-align: -0.2em;
+  color: var(--sl-color-text-accent);
+}
+.prose .inline-icon.icon-green {
+  color: var(--sl-color-green);
+}
+.prose .inline-icon.icon-orange {
+  color: var(--sl-color-orange);
+}
+.prose .inline-icon.icon-blue {
+  color: var(--sl-color-accent);
 }
 
 .prose strong {

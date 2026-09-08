@@ -8,9 +8,20 @@ import CardGrid from "../components/content/CardGrid.astro";
 import Steps from "../components/content/Steps.astro";
 import FileTree from "../components/content/FileTree.astro";
 import Aside from "../components/content/Aside.astro";
+import Lede from "../components/content/Lede.astro";
+import Icon from "../components/Icon.astro";
 
 // provided to every mdx page so content can use <Steps>/<Card>/<Aside>/… without importing
-const mdxComponents = { Badge, Card, CardGrid, Steps, FileTree, Aside };
+const mdxComponents = {
+  Badge,
+  Card,
+  CardGrid,
+  Steps,
+  FileTree,
+  Aside,
+  Lede,
+  Icon,
+};
 
 export async function getStaticPaths() {
   const docs = await getCollection("docs", ({ data }) => !data.draft);

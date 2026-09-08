@@ -3,10 +3,12 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
   "[markdown]": {
-    "editor.defaultFormatter": "unifiedjs.vscode-remark"
+    "editor.defaultFormatter": "unifiedjs.vscode-remark",
+    "editor.wordWrap": "on"
   },
   "[mdx]": {
-    "editor.formatOnSave": false
+    "editor.formatOnSave": false,
+    "editor.wordWrap": "on"
   },
   "emeraldwalk.runonsave": {
     "commands": [
