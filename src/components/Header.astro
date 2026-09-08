@@ -17,6 +17,7 @@ const { hasSidebar = false } = Astro.props;
   </div>
   <nav class="top-nav">
     <a href="/getting-started">Docs</a>
+    <a href="/what-is-caby">About</a>
   </nav>
   <div class="right-group">
     <SearchDialog />
@@ -81,14 +82,32 @@ const { hasSidebar = false } = Astro.props;
     margin-inline-start: 1.5rem;
   }
   .top-nav a {
+    position: relative;
+    display: inline-block;
+    padding-inline: 0.3rem;
+    margin-inline: -0.3rem;
     color: var(--sl-color-white);
     font-size: var(--sl-text-sm);
     font-weight: 600;
     white-space: nowrap;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .top-nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.45em;
+    width: 0;
+    height: 2px;
+    background-color: var(--sl-color-accent-high);
+    transition: width 0.2s ease;
   }
   .top-nav a:hover {
     color: var(--sl-color-text-accent);
-    text-decoration: none;
+  }
+  .top-nav a:hover::after {
+    width: 100%;
   }
 
   .right-group {

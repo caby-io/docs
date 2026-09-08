@@ -41,7 +41,6 @@ export const sidebar: NavItem[] = [
     items: [
       { label: "Docker", link: "/installation/docker" },
       { label: "Kubernetes", link: "/installation/kubernetes" },
-      { label: "Helm", link: "/installation/helm" },
     ],
   },
   {

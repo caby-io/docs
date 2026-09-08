@@ -45,6 +45,8 @@ export default defineConfig({
     "/docs/installation/docker": "/installation/docker",
     "/docs/installation/kubernetes": "/installation/kubernetes",
     "/docs/configuration/main-config": "/configuration/main-config",
+    // helm.mdx merged into kubernetes.mdx (#helm / #kubectl sections)
+    "/installation/helm": "/installation/kubernetes",
   },
   integrations: [
     icon(),
