@@ -1,70 +1,85 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
-import starlight from '@astrojs/starlight';
+import { defineConfig } from "astro/config";
+import { fileURLToPath } from "node:url";
+import mdx from "@astrojs/mdx";
+import icon from "astro-icon";
+import expressiveCode from "astro-expressive-code";
+import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
+import { pluginFileIcons } from "@xt0rted/expressive-code-file-icons";
 
-// https://astro.build/config
+// build the pagefind static search index from the output HTML after each build
+function pagefind() {
+  return {
+    name: "caby-pagefind",
+    hooks: {
+      "astro:build:done": async ({ dir, logger }) => {
+        const site = fileURLToPath(dir);
+        const pf = await import("pagefind");
+        const { index } = await pf.createIndex();
+        await index.addDirectory({ path: site });
+        await index.writeFiles({ outputPath: `${site}pagefind` });
+        await pf.close();
+        logger.info("pagefind index built");
+      },
+    },
+  };
+}
+
 export default defineConfig({
-  site: 'https://caby.io',
-  // WSL2's inotify drops file-change events, so Astro's watcher (HMR *and* the
-  // auto-restart on astro.config.* edits) can silently miss changes. Polling
-  // makes the dev server reliably pick them up. Dev-only; ignored by builds.
+  site: "https://caby.io",
   vite: {
-    server: {
-      watch: { usePolling: true },
+    // WSL2's inotify drops file-change events; polling keeps the dev watcher reliable.
+    server: { watch: { usePolling: true } },
+    // lightningcss minifies and autoprefixes (e.g. -webkit-backdrop-filter for Safari) off
+    // cssTarget; esbuild's minifier instead strips the unprefixed rule, killing blur in Firefox.
+    build: {
+      cssMinify: "lightningcss",
+      cssTarget: ["chrome111", "firefox113", "safari16"],
     },
   },
-  // Preserve inbound links from the old VitePress /docs/* URLs.
+  // old VitePress /docs/* inbound links
   redirects: {
-    '/docs': '/getting-started',
-    '/docs/overview': '/getting-started',
-    '/overview': '/getting-started',
-    '/docs/what-is-caby': '/what-is-caby',
-    '/docs/installation/docker': '/installation/docker',
-    '/docs/installation/kubernetes': '/installation/kubernetes',
-    '/docs/configuration/main-config': '/configuration/main-config',
+    "/docs": "/getting-started",
+    "/docs/overview": "/getting-started",
+    "/overview": "/getting-started",
+    "/docs/what-is-caby": "/what-is-caby",
+    "/docs/installation/docker": "/installation/docker",
+    "/docs/installation/kubernetes": "/installation/kubernetes",
+    "/docs/configuration/main-config": "/configuration/main-config",
   },
   integrations: [
-    starlight({
-      title: 'Caby',
-      description: 'Caby — A self-hosted file management app',
-      customCss: ['./src/styles/hero.css'],
-      logo: {
-        light: './src/assets/caby-logo-light.svg',
-        dark: './src/assets/caby-logo-dark.svg',
-        replacesTitle: true, // mirrors VitePress siteTitle: false
+    icon(),
+    // expressiveCode must precede mdx so it processes ``` fences first
+    expressiveCode({
+      themes: ["github-light", "github-dark"],
+      themeCssSelector: (theme) => `[data-theme='${theme.type}']`,
+      plugins: [pluginLineNumbers(), pluginFileIcons()],
+      defaultProps: { showLineNumbers: false },
+      useThemedScrollbars: false,
+      // glass frame (matches the nav pill); blur is added in base.css
+      styleOverrides: {
+        borderColor: "var(--code-border)",
+        borderRadius: "var(--code-radius)",
+        borderWidth: "1px",
+        codeBackground: "var(--code-bg)",
+        codeFontFamily: "var(--sl-font-mono)",
+        frames: {
+          editorActiveTabIndicatorHeight: "1px",
+          editorBackground: "var(--code-bg)",
+          terminalBackground: "var(--code-bg)",
+          // filename tab shares the darker header bg so the whole figcaption reads as one strip
+          editorActiveTabBackground: "var(--code-header-bg)",
+          editorTabBarBackground: "var(--code-header-bg)",
+          terminalTitlebarBackground: "var(--code-header-bg)",
+          editorTabBarBorderBottomColor: "var(--code-border)",
+          terminalTitlebarBorderBottomColor: "var(--code-border)",
+          editorActiveTabIndicatorTopColor: "transparent",
+          editorActiveTabIndicatorBottomColor: "var(--sl-color-accent)",
+          frameBoxShadowCssValue: "var(--box-shadow-0)",
+        },
       },
-      favicon: '/favicon.svg',
-      head: [
-        {
-          tag: 'link',
-          attrs: { rel: 'icon', type: 'image/png', href: '/favicon.png' },
-        },
-      ],
-      social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/caby-io/caby' },
-        { icon: 'discord', label: 'Discord', href: 'https://discord.gg/Z2JkSs2Hzy' },
-      ],
-      sidebar: [
-        {
-          label: 'Welcome',
-          items: [
-            { label: 'Getting Started', link: '/getting-started' },
-            { label: 'What is Caby?', link: '/what-is-caby' },
-          ],
-        },
-        {
-          label: 'Installation',
-          items: [
-            { label: 'Docker', link: '/installation/docker' },
-            { label: 'Kubernetes', link: '/installation/kubernetes' },
-            { label: 'Helm', link: '/installation/helm' },
-          ],
-        },
-        {
-          label: 'Configuration',
-          items: [{ label: 'Main Config', link: '/configuration/main-config' }],
-        },
-      ],
     }),
+    mdx(),
+    pagefind(),
   ],
 });

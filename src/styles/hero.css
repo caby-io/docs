@@ -1,48 +1,113 @@
-/* Home splash hero (has a hero image, no sidebar): let the product screenshot
-   show larger than Starlight's default 25rem cap and share the row more evenly
-   with the copy. */
+.splash {
+  flex: 1;
+}
+
+/* content tracks the pill's inner edges (logo ↔ content-left, toggle ↔ right) at
+   all widths, mobile included */
+.splash-inner {
+  padding-inline: calc(var(--nav-pill-inset) + var(--sl-nav-pad-x));
+  padding-top: calc(var(--sl-nav-height) + var(--nav-top-gap) + 1.5rem);
+  padding-bottom: 2rem;
+}
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  gap: 2rem;
+  align-content: start;
+  min-height: calc(100svh - var(--sl-nav-height) - var(--nav-top-gap) - 3rem);
+  padding-block: 2rem;
+}
 @media (min-width: 50rem) {
-  [data-has-hero]:not([data-has-sidebar]) .hero {
+  .hero {
     grid-template-columns: 5fr 6fr;
-  }
-
-  [data-has-hero]:not([data-has-sidebar]) .hero > .hero-html {
-    width: 100%;
-    max-width: 42rem;
+    align-items: center;
+    gap: 3rem;
   }
 }
 
-/* Doc-page hero (hero + sidebar, e.g. Getting Started): there's no image, so
-   drop Starlight's reserved image column and the 50ch copy cap and let the
-   title / tagline / actions span the full (widened) content column. */
-[data-has-hero][data-has-sidebar] .hero {
-  grid-template-columns: 1fr;
-}
-
-[data-has-hero][data-has-sidebar] .hero .copy > * {
-  max-width: none;
-}
-
-/* Faint grid texture across the whole page background, fading out from the
-   top-right corner — borrowed from the Astro docs hero, applied page-wide.
-   Fixed + z-index:-1 paints above the page background but behind all content. */
-[data-has-hero][data-has-sidebar] body::before {
-  content: '';
-  position: fixed;
+/* faint grid across the page body, fading out by 100vh; clipped to the page so
+   short pages don't scroll past the footer */
+.hero-grid {
+  position: absolute;
   inset: 0;
   z-index: -1;
+  overflow: clip;
   pointer-events: none;
-  background-image:
-    linear-gradient(to right, var(--sl-color-white) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--sl-color-white) 1px, transparent 1px);
-  background-size: 23px 23px;
-  -webkit-mask-image: radial-gradient(circle at 100% 0%, white, transparent 65%);
-  mask-image: radial-gradient(circle at 100% 0%, white, transparent 65%);
-  opacity: 0.05;
+}
+.hero-grid::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 100vh;
+  background-image: var(--grid-image);
+  background-size: var(--grid-size) var(--grid-size);
+  mask-image: linear-gradient(to bottom, white, transparent);
+  opacity: 0.04;
 }
 
-/* Astro's docs hero tagline is a plain paragraph (~1rem); Starlight's default
-   scales up to --sl-text-xl. Match the smaller size on this doc hero. */
-[data-has-hero][data-has-sidebar] .hero .tagline {
-  font-size: var(--sl-text-base);
+.hero-copy h1 {
+  font-size: var(--sl-text-h1);
+  font-weight: 700;
+  color: var(--sl-color-white);
+  line-height: var(--sl-line-height-headings);
+}
+.hero-copy .tagline {
+  margin-top: 1rem;
+  font-size: var(--sl-text-lg);
+  color: var(--sl-color-gray-2);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+.button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.1rem;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  font-size: var(--sl-text-sm);
+  font-weight: 500;
+}
+.button:hover {
+  text-decoration: none;
+}
+.button.primary {
+  background: linear-gradient(320deg, var(--clr-primary), var(--clr-accent));
+  color: var(--clr-background-2);
+}
+.button.secondary {
+  background: var(--code-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border-color: var(--clr-border);
+  box-shadow: var(--box-shadow-0);
+  color: var(--sl-color-white);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.button.secondary:hover {
+  border-color: color-mix(in oklab, var(--sl-color-accent) 35%, transparent);
+  box-shadow:
+    var(--box-shadow-0),
+    0 0 20px color-mix(in oklab, var(--sl-color-accent) 22%, transparent);
+}
+
+.hero-image video {
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  box-shadow:
+    0 3px 1rem -1px var(--clr-shadow),
+    0 0 24px color-mix(in oklab, var(--sl-color-accent) 16%, transparent);
+}
+
+.splash-content {
+  margin-top: 2rem;
 }

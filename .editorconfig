@@ -1,0 +1,13 @@
+# https://editorconfig.org
+# Scoped to .mdx only — everything else is formatted by Prettier (see
+# .prettierrc.json). Prettier only targets legacy MDX v1 and can corrupt
+# JSX/component syntax in our .mdx files, so prose-level rules for those
+# are instead enforced by remark-lint (see .remarkrc.mjs); this file just
+# covers the safe whitespace basics editorconfig-aware editors apply on save.
+root = true
+
+[*.mdx]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+insert_final_newline = true

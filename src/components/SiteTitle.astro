@@ -1,0 +1,31 @@
+---
+import { site } from "../config/site";
+import logoLight from "../assets/caby-logo-light.svg";
+import logoDark from "../assets/caby-logo-dark.svg";
+---
+
+<a href="/" class="site-title" aria-label={site.title}>
+  <img src={logoDark.src} alt={site.title} class="logo logo-dark" />
+  <img src={logoLight.src} alt="" aria-hidden="true" class="logo logo-light" />
+</a>
+
+<style>
+  .site-title {
+    display: inline-flex;
+    align-items: center;
+  }
+  .logo {
+    height: 1.75rem;
+    width: auto;
+  }
+  /* dark is default; light logo shows under [data-theme='light'] */
+  .logo-light {
+    display: none;
+  }
+  :global([data-theme="light"]) .logo-light {
+    display: block;
+  }
+  :global([data-theme="light"]) .logo-dark {
+    display: none;
+  }
+</style>

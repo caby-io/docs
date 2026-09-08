@@ -1,0 +1,77 @@
+---
+import Icon from "../Icon.astro";
+
+interface Props {
+  title: string;
+  icon?: string;
+}
+
+const { title, icon } = Astro.props;
+---
+
+<article class="card">
+  <p class="card-title">
+    {
+      icon && (
+        <span class="card-icon">
+          <Icon name={icon} />
+        </span>
+      )
+    }
+    <span>{title}</span>
+  </p>
+  <div class="card-body"><slot /></div>
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.5rem, calc(0.125rem + 1vw), 1rem);
+    border: 1px solid var(--code-border);
+    border-radius: 0.5rem;
+    padding: clamp(1rem, calc(0.5rem + 2vw), 1.75rem);
+    background-color: var(--code-bg);
+    backdrop-filter: blur(var(--glass-blur));
+  }
+
+  .card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+    font-size: var(--sl-text-h4);
+    font-weight: 600;
+    line-height: var(--sl-line-height-headings);
+    color: var(--sl-color-white);
+  }
+
+  .card-icon {
+    display: flex;
+    padding: 0.35em;
+    border: 1px solid
+      color-mix(in oklab, var(--sl-color-accent) 30%, transparent);
+    border-radius: 0.375rem;
+    background-color: color-mix(
+      in oklab,
+      var(--sl-color-accent) 12%,
+      transparent
+    );
+    color: var(--sl-color-text-accent);
+    font-size: var(--sl-text-h5);
+  }
+
+  .card-body {
+    font-size: clamp(
+      var(--sl-text-sm),
+      calc(0.5rem + 1vw),
+      var(--sl-text-base)
+    );
+  }
+  .card-body :global(> :first-child) {
+    margin-top: 0;
+  }
+  .card-body :global(> :last-child) {
+    margin-bottom: 0;
+  }
+</style>

@@ -1,0 +1,125 @@
+---
+import SiteTitle from "./SiteTitle.astro";
+import SocialIcons from "./SocialIcons.astro";
+import ThemeSelect from "./ThemeSelect.astro";
+import MobileMenuToggle from "./MobileMenuToggle.astro";
+import SearchDialog from "./SearchDialog.astro";
+
+interface Props {
+  hasSidebar?: boolean;
+}
+const { hasSidebar = false } = Astro.props;
+---
+
+<header class="header">
+  <div class="title-wrapper">
+    <SiteTitle />
+  </div>
+  <nav class="top-nav">
+    <a href="/getting-started">Docs</a>
+  </nav>
+  <div class="right-group">
+    <SearchDialog />
+    <SocialIcons />
+    <span class="divider"></span>
+    <ThemeSelect />
+  </div>
+</header>
+{hasSidebar && <MobileMenuToggle />}
+
+<script>
+  const root = document.documentElement;
+  const setScrolled = () =>
+    root.toggleAttribute("data-nav-scrolled", window.scrollY > 8);
+  setScrolled();
+  addEventListener("scroll", setScrolled, { passive: true });
+</script>
+
+<style>
+  /* the floating pill: fixed, centered on an 80rem band; paints on scroll or hover */
+  .header {
+    position: fixed;
+    inset-block-start: var(--nav-top-gap);
+    inset-inline: var(--nav-pill-inset);
+    z-index: var(--sl-z-index-navbar);
+    height: var(--sl-nav-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sl-nav-gap);
+    padding: var(--sl-nav-pad-y) var(--sl-nav-pad-x);
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background-color: transparent;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      backdrop-filter 0.2s ease;
+  }
+  :global(:root[data-nav-scrolled]) .header {
+    border-color: var(--clr-border);
+    background-color: color-mix(
+      in oklab,
+      var(--sl-color-bg-nav) 70%,
+      transparent
+    );
+    backdrop-filter: blur(var(--nav-blur));
+    box-shadow: var(--box-shadow-0);
+  }
+
+  .title-wrapper {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .top-nav {
+    display: flex;
+    gap: 1.25rem;
+    margin-inline-end: auto;
+    margin-inline-start: 1.5rem;
+  }
+  .top-nav a {
+    color: var(--sl-color-white);
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .top-nav a:hover {
+    color: var(--sl-color-text-accent);
+    text-decoration: none;
+  }
+
+  .right-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .divider {
+    width: 1px;
+    height: 1.5rem;
+    background-color: var(--sl-color-gray-5);
+  }
+
+  @media (max-width: 50rem) {
+    .top-nav,
+    .right-group {
+      display: none;
+    }
+  }
+
+  /* wide viewports: line the nav links up with the doc content column
+     (less the header's own flex gap, which sits after the logo box) */
+  @media (min-width: 84rem) {
+    .title-wrapper {
+      flex-shrink: 0;
+      width: calc(
+        var(--sidebar-width) + var(--doc-col-gap) - var(--sl-nav-gap)
+      );
+    }
+    .top-nav {
+      margin-inline-start: 0;
+    }
+  }
+</style>

@@ -1,0 +1,66 @@
+---
+import SidebarItem from "./SidebarItem.astro";
+import { sidebar, isGroup } from "../config/site";
+
+interface Props {
+  currentPath: string;
+}
+const { currentPath } = Astro.props;
+
+const topLinks = sidebar.filter((i) => !isGroup(i));
+const groups = sidebar.filter(isGroup);
+---
+
+<nav class="sidebar" aria-label="Docs navigation">
+  {
+    topLinks.length > 0 && (
+      <div class="sidebar-links">
+        {topLinks.map((item) => (
+          <SidebarItem item={item} currentPath={currentPath} />
+        ))}
+      </div>
+    )
+  }
+  {
+    groups.map((group) => (
+      <section class="sidebar-section">
+        <h2 class="section-label">{group.label}</h2>
+        <div class="section-items">
+          {isGroup(group) &&
+            group.items.map((item) => (
+              <SidebarItem item={item} currentPath={currentPath} />
+            ))}
+        </div>
+      </section>
+    ))
+  }
+</nav>
+
+<style>
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    padding-block: 0.25rem 0.5rem;
+    padding-inline-end: 0.5rem;
+    font-size: var(--sl-text-sm);
+  }
+  .sidebar-section + .sidebar-section,
+  .sidebar-links + .sidebar-section {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--clr-border);
+  }
+  .section-label {
+    margin: 0 0 0.5rem;
+    padding-inline: 0.75rem;
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    color: var(--sl-color-white);
+    line-height: 1.5;
+  }
+  .section-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+</style>

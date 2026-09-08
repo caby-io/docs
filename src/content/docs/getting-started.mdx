@@ -6,16 +6,10 @@ prev: false
 next: false
 # Drop the right-hand "On this page" TOC so the content gets full width.
 tableOfContents: false
-# Widen the main content column (default --sl-content-width is 45rem). Injected
-# here so it only affects this page, not the whole site.
-head:
-  - tag: style
-    content: ':root{--sl-content-width:72rem}'
 hero:
   tagline: If you already know how you want to deploy Caby, head over to the relevant deployment instructions below. To learn more about how Caby works and the design decisions we've made, see <a href="/what-is-caby">What is Caby?</a>.
 ---
 
-import { CardGrid } from '@astrojs/starlight/components';
 import DeployCard from '../../components/DeployCard.astro';
 import { docker, kubernetes } from '../../components/brand-icons';
 
@@ -26,6 +20,7 @@ import { docker, kubernetes } from '../../components/brand-icons';
     - [Docker Compose](/installation/docker#docker-compose)
     - [Docker CLI](/installation/docker#docker-cli)
   </DeployCard>
+
   <DeployCard title="Kubernetes" accentColor="#326CE5" accentTint="rgba(50, 108, 229, 0.2)" iconPath={kubernetes}>
     - [Deploy with kubectl](/installation/kubernetes)
     - [Deploy with Helm](/installation/helm)

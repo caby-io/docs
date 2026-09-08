@@ -1,0 +1,38 @@
+---
+import { Icon as Iconify } from "astro-icon/components";
+
+interface Props {
+  name: string;
+  class?: string;
+  size?: string;
+}
+const { name, class: className, size } = Astro.props;
+
+// our short names → iconify ids (lucide + simple-icons brand marks). unknown
+// names pass through, so `<Icon name="lucide:x" />` also works directly.
+const MAP: Record<string, string> = {
+  desktop: "lucide:monitor",
+  sun: "lucide:sun",
+  moon: "lucide:moon",
+  bars: "lucide:menu",
+  close: "lucide:x",
+  "right-caret": "lucide:chevron-right",
+  external: "lucide:external-link",
+  check: "lucide:check",
+  search: "lucide:search",
+  rocket: "lucide:rocket",
+  "open-book": "lucide:book-open",
+  "approve-check": "lucide:circle-check",
+  file: "lucide:file",
+  folder: "lucide:folder",
+  github: "simple-icons:github",
+  discord: "simple-icons:discord",
+  info: "lucide:info",
+  warning: "lucide:triangle-alert",
+  danger: "lucide:octagon-alert",
+  tip: "lucide:lightbulb",
+};
+const iconName = MAP[name] ?? name;
+---
+
+<Iconify name={iconName} class={className} {...size ? { size } : {}} />

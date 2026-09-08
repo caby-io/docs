@@ -1,0 +1,356 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Sidebar from "../components/Sidebar.astro";
+import TableOfContents from "../components/TableOfContents.astro";
+import Footer from "../components/Footer.astro";
+import Icon from "../components/Icon.astro";
+import {
+  sidebar,
+  isGroup,
+  githubEditBase,
+  type NavItem,
+  type NavLink,
+} from "../config/site";
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+interface Props {
+  id: string;
+  title: string;
+  description?: string;
+  headings: Heading[];
+  currentPath: string;
+  tableOfContents?: boolean;
+  prev?: boolean | string;
+  next?: boolean | string;
+  hero?: { tagline?: string };
+}
+const {
+  id,
+  title,
+  description,
+  headings,
+  currentPath,
+  tableOfContents = true,
+  prev,
+  next,
+  hero,
+} = Astro.props;
+const showToc =
+  tableOfContents && headings.some((h) => h.depth >= 2 && h.depth <= 3);
+
+// eyebrow = the top-level section this page lives under
+const norm = (p: string) => "/" + p.replace(/^\/+|\/+$/g, "");
+const contains = (items: NavItem[]): boolean =>
+  items.some((i) =>
+    isGroup(i) ? contains(i.items) : norm(i.link) === norm(currentPath),
+  );
+const section = sidebar.find((i) => isGroup(i) && contains(i.items));
+const eyebrow = section && isGroup(section) ? section.label : undefined;
+const subtitle = hero?.tagline ?? description;
+
+const editUrl = `${githubEditBase}/${id}.mdx`;
+
+// prev/next walk the flattened sidebar order
+const flatten = (items: NavItem[]): NavLink[] =>
+  items.flatMap((i) => (isGroup(i) ? flatten(i.items) : [i]));
+const flat = flatten(sidebar);
+const idx = flat.findIndex((l) => norm(l.link) === norm(currentPath));
+const prevLink = prev !== false && idx > 0 ? flat[idx - 1] : undefined;
+const nextLink =
+  next !== false && idx >= 0 && idx < flat.length - 1
+    ? flat[idx + 1]
+    : undefined;
+---
+
+<BaseLayout title={title} description={description}>
+  <Header hasSidebar={true} />
+
+  <div class="hero-grid" aria-hidden="true"></div>
+
+  <div id="caby-mobile-nav" popover="auto" class="mobile-nav">
+    <Sidebar currentPath={currentPath} />
+  </div>
+
+  <main class:list={["docs-main", { "has-toc": showToc }]}>
+    <aside class="sidebar-rail">
+      <div class="rail-sticky">
+        <Sidebar currentPath={currentPath} />
+      </div>
+    </aside>
+
+    <article class="content" data-pagefind-body>
+      <header class="page-header">
+        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+        <h1>{title}</h1>
+        {subtitle && <p class="subtitle" set:html={subtitle} />}
+        <hr class="header-divider" />
+      </header>
+      <div class="prose"><slot /></div>
+
+      {
+        (prevLink || nextLink) && (
+          <nav class="pagination" aria-label="Page navigation">
+            {prevLink ? (
+              <a class="pager prev" href={prevLink.link}>
+                <span class="dir">
+                  <Icon name="lucide:arrow-left" /> Previous
+                </span>
+                <span class="pg-label">{prevLink.label}</span>
+              </a>
+            ) : (
+              <span />
+            )}
+            {nextLink ? (
+              <a class="pager next" href={nextLink.link}>
+                <span class="dir">
+                  Next <Icon name="lucide:arrow-right" />
+                </span>
+                <span class="pg-label">{nextLink.label}</span>
+              </a>
+            ) : (
+              <span />
+            )}
+          </nav>
+        )
+      }
+
+      {
+        !showToc && (
+          <div class="page-actions">
+            <a class="edit-link" href={editUrl} target="_blank" rel="noopener">
+              <Icon name="lucide:pencil" /> Edit this page
+            </a>
+          </div>
+        )
+      }
+    </article>
+
+    {
+      showToc && (
+        <aside class="page-aside">
+          <div class="rail-sticky">
+            <TableOfContents headings={headings} />
+            <a
+              class="edit-link divided"
+              href={editUrl}
+              target="_blank"
+              rel="noopener"
+            >
+              <Icon name="lucide:pencil" /> Edit this page
+            </a>
+          </div>
+        </aside>
+      )
+    }
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .docs-main {
+    flex: 1;
+    width: 100%;
+    max-width: var(--nav-width);
+    margin-inline: auto;
+    padding-inline: var(--sl-content-pad-x);
+    padding-top: calc(var(--sl-nav-height) + var(--nav-top-gap) + 1.5rem);
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: var(--doc-col-gap);
+  }
+  @media (min-width: 50rem) {
+    .docs-main {
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    }
+  }
+  @media (min-width: 72rem) {
+    .docs-main.has-toc {
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr) var(
+          --toc-width
+        );
+    }
+  }
+
+  .sidebar-rail,
+  .page-aside {
+    display: none;
+  }
+  @media (min-width: 50rem) {
+    .sidebar-rail {
+      display: block;
+    }
+  }
+  @media (min-width: 72rem) {
+    .has-toc .page-aside {
+      display: block;
+    }
+  }
+
+  .rail-sticky {
+    position: sticky;
+    top: calc(var(--sl-nav-height) + var(--nav-top-gap) + 1.5rem);
+    max-height: calc(100vh - var(--sl-nav-height) - var(--nav-top-gap) - 3rem);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--sl-color-gray-5) transparent;
+  }
+  .rail-sticky::-webkit-scrollbar {
+    width: 6px;
+  }
+  .rail-sticky::-webkit-scrollbar-thumb {
+    background: var(--sl-color-gray-5);
+    border-radius: 3px;
+  }
+
+  .content {
+    min-width: 0;
+    padding-block: 0.5rem 2rem;
+  }
+  .page-header {
+    margin-bottom: 2rem;
+  }
+  .eyebrow {
+    margin: 0 0 0.4rem;
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    color: var(--sl-color-text-accent);
+  }
+  .page-header h1 {
+    font-size: var(--sl-text-h1);
+    font-weight: 700;
+    color: var(--sl-color-white);
+    line-height: var(--sl-line-height-headings);
+  }
+  .subtitle {
+    margin-top: 0.75rem;
+    font-size: var(--sl-text-lg);
+    color: var(--sl-color-gray-3);
+  }
+  .header-divider {
+    margin-top: 1.5rem;
+    border: none;
+    border-top: 1px solid var(--clr-border);
+  }
+
+  .page-actions {
+    margin-top: 2rem;
+  }
+  .edit-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-xs);
+  }
+  .edit-link.divided {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--clr-border);
+  }
+  .edit-link:hover {
+    color: var(--sl-color-text-accent);
+    text-decoration: none;
+  }
+  .edit-link :global(svg) {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .pagination {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--clr-border);
+  }
+  .pager {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--clr-border);
+    border-radius: var(--code-radius);
+    background-color: color-mix(
+      in oklab,
+      var(--sl-color-bg-nav) 45%,
+      transparent
+    );
+    backdrop-filter: blur(var(--glass-blur));
+    color: var(--sl-color-white);
+  }
+  .pager:hover {
+    border-color: color-mix(in oklab, var(--sl-color-accent) 60%, transparent);
+    background-color: color-mix(
+      in oklab,
+      var(--sl-color-accent) 8%,
+      transparent
+    );
+    text-decoration: none;
+  }
+  .pager.next {
+    align-items: flex-end;
+    text-align: end;
+  }
+  .pager .dir {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+  }
+  .pager .pg-label {
+    font-weight: 600;
+  }
+  .pager :global(svg) {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  /* clip container bounded to the page so the tall grid can't extend the scroll area */
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: clip;
+    pointer-events: none;
+  }
+  .hero-grid::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    inset-inline: 0;
+    height: 180vh;
+    background-image: var(--grid-image);
+    background-size: var(--grid-size) var(--grid-size);
+    mask-image: radial-gradient(130% 100% at 100% 0%, white, transparent 85%);
+    opacity: 0.03;
+  }
+
+  .mobile-nav {
+    position: fixed;
+    inset-block: calc(var(--sl-nav-height) + var(--nav-top-gap)) 0;
+    inset-inline-start: 0;
+    width: min(20rem, 85%);
+    margin: 0;
+    padding: 1.5rem;
+    border: none;
+    border-inline-end: 1px solid var(--clr-border);
+    background-color: var(--sl-color-bg);
+    overflow-y: auto;
+  }
+  .mobile-nav:not(:popover-open) {
+    display: none;
+  }
+  @media (min-width: 50rem) {
+    .mobile-nav {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,281 @@
+---
+import Icon from "./Icon.astro";
+---
+
+<button id="search-trigger" class="search-trigger" aria-label="Search docs">
+  <Icon name="search" />
+  <span class="label">Search</span>
+  <kbd id="search-kbd">⌘K</kbd>
+</button>
+
+<dialog id="search-dialog" class="search-dialog" aria-label="Search">
+  <div class="search-box">
+    <Icon name="search" class="box-icon" />
+    <input
+      type="search"
+      id="search-input"
+      placeholder="Search docs"
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <button id="search-close" class="box-close" aria-label="Close search"
+      ><Icon name="close" /></button
+    >
+  </div>
+  <div id="search-results" class="search-results"></div>
+</dialog>
+
+<script>
+  const trigger = document.getElementById("search-trigger");
+  const dialog = document.getElementById(
+    "search-dialog",
+  ) as HTMLDialogElement | null;
+  const input = document.getElementById(
+    "search-input",
+  ) as HTMLInputElement | null;
+  const results = document.getElementById("search-results");
+  const closeBtn = document.getElementById("search-close");
+
+  // show the OS-appropriate shortcut (the handler accepts both meta and ctrl)
+  const kbd = document.getElementById("search-kbd");
+  const isMac = /Mac|iPhone|iPad|iPod/.test(
+    navigator.platform || navigator.userAgent,
+  );
+  if (kbd) kbd.textContent = isMac ? "⌘K" : "Ctrl K";
+
+  let pf: any = null;
+  let loaded = false;
+  async function loadPagefind() {
+    if (loaded) return pf;
+    loaded = true;
+    // the pagefind index only exists in the built site, not in dev
+    if (import.meta.env.DEV) return pf;
+    try {
+      // runtime-computed so vite never tries to resolve it at transform time
+      const src = `${location.origin}/pagefind/pagefind.js`;
+      pf = await import(/* @vite-ignore */ src);
+      await pf.init?.();
+    } catch {
+      pf = null;
+    }
+    return pf;
+  }
+
+  const showEmpty = () => {
+    if (results)
+      results.innerHTML =
+        '<p class="search-note">Type to search documentation.</p>';
+  };
+  const open = () => {
+    dialog?.showModal();
+    input?.focus();
+    if (!input?.value) showEmpty();
+    loadPagefind();
+  };
+  const close = () => dialog?.close();
+
+  trigger?.addEventListener("click", open);
+  closeBtn?.addEventListener("click", close);
+  dialog?.addEventListener("click", (e) => {
+    if (e.target === dialog) close();
+  });
+  document.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      dialog?.open ? close() : open();
+    }
+  });
+
+  const esc = (s: string) =>
+    s.replace(
+      /[&<>"]/g,
+      (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!,
+    );
+
+  let timer: number;
+  input?.addEventListener("input", () => {
+    clearTimeout(timer);
+    timer = window.setTimeout(async () => {
+      const q = input.value.trim();
+      if (!results) return;
+      if (!q) {
+        showEmpty();
+        return;
+      }
+      const p = await loadPagefind();
+      if (!p) {
+        results.innerHTML =
+          '<p class="search-note">Search works on the built site (<code>pnpm build &amp;&amp; pnpm preview</code>).</p>';
+        return;
+      }
+      const search = await p.search(q);
+      const data = await Promise.all(
+        search.results.slice(0, 8).map((r: any) => r.data()),
+      );
+      results.innerHTML =
+        data
+          .map(
+            (d: any) => `
+        <a class="search-result" href="${d.url}">
+          <span class="result-title">${esc(d.meta?.title ?? d.url)}</span>
+          <span class="result-excerpt">${d.excerpt}</span>
+        </a>`,
+          )
+          .join("") || '<p class="search-note">No results.</p>';
+    }, 150);
+  });
+</script>
+
+<style>
+  .search-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 2rem;
+    min-width: 13rem;
+    padding: 0 0.5rem 0 0.75rem;
+    border: 1px solid var(--clr-border);
+    border-radius: 999px;
+    background-color: var(--clr-background-2);
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+    cursor: pointer;
+  }
+  .search-trigger .label {
+    margin-inline-end: auto;
+  }
+  .search-trigger:hover {
+    color: var(--sl-color-white);
+  }
+  .search-trigger kbd {
+    font-family: inherit;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-4);
+    border: 1px solid var(--clr-border);
+    border-radius: 0.25rem;
+    padding: 0 0.25rem;
+  }
+
+  .search-dialog {
+    margin: 10vh auto auto;
+    width: min(42rem, calc(100vw - 2rem));
+    padding: 0;
+    border: 1px solid var(--clr-border);
+    border-radius: 1rem;
+    background-color: color-mix(
+      in oklab,
+      var(--sl-color-bg-nav) 85%,
+      transparent
+    );
+    backdrop-filter: blur(var(--glass-blur));
+    color: var(--sl-color-text);
+    box-shadow: var(--box-shadow-0);
+    overflow: hidden;
+  }
+  .search-dialog::backdrop {
+    background-color: color-mix(
+      in oklab,
+      var(--sl-color-black) 55%,
+      transparent
+    );
+    backdrop-filter: blur(2px);
+  }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    height: 3.5rem;
+    padding-inline: 1rem;
+    border-bottom: 1px solid var(--sl-color-hairline);
+  }
+  .box-icon {
+    color: var(--sl-color-gray-3);
+    flex-shrink: 0;
+  }
+  #search-input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: none;
+    color: var(--sl-color-white);
+    font: inherit;
+    font-size: var(--sl-text-base);
+    outline: none;
+  }
+  .box-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: 0.5rem;
+    background: none;
+    color: var(--sl-color-gray-3);
+    cursor: pointer;
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .box-close:hover {
+    color: var(--sl-color-white);
+    background-color: color-mix(
+      in oklab,
+      var(--sl-color-gray-5) 25%,
+      transparent
+    );
+  }
+
+  .search-results {
+    overflow-y: auto;
+    max-height: min(30rem, calc(100dvh - 10rem));
+    padding: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--sl-color-gray-5) transparent;
+  }
+  .search-result {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+  }
+  .search-result:hover {
+    background-color: color-mix(
+      in oklab,
+      var(--sl-color-accent) 15%,
+      transparent
+    );
+  }
+  .result-title {
+    color: var(--sl-color-white);
+    font-weight: 600;
+    font-size: var(--sl-text-sm);
+  }
+  .result-excerpt {
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-xs);
+    line-height: 1.4;
+  }
+  .result-excerpt :global(mark) {
+    background: none;
+    color: var(--sl-color-text-accent);
+    font-weight: 600;
+  }
+  .search-note {
+    padding: 2rem 0.75rem;
+    text-align: center;
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+  }
+
+  @media (max-width: 30rem) {
+    .search-trigger .label,
+    .search-trigger kbd {
+      display: none;
+    }
+  }
+</style>

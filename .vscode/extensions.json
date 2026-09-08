@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "EditorConfig.EditorConfig",
+    "astro-build.astro-vscode",
+    "esbenp.prettier-vscode",
+    "unifiedjs.vscode-remark",
+    "unifiedjs.vscode-mdx",
+    "emeraldwalk.runonsave"
+  ]
+}

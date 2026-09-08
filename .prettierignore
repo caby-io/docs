@@ -1,0 +1,9 @@
+# MDX/Markdown prose is formatted by remark instead — see .remarkrc.mjs.
+# Prettier only targets MDX v1 and can corrupt JSX/component syntax in .mdx.
+*.md
+*.mdx
+
+pnpm-lock.yaml
+dist/
+.astro/
+public/pagefind/
