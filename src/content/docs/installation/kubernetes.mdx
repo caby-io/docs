@@ -7,33 +7,35 @@ import RandomizeTokens from '../../../components/RandomizeTokens.astro';
 
 <RandomizeTokens />
 
-We recommend using our [official Helm Chart](https://github.com/caby-io/caby/tree/main/charts/caby) for deploying to Kubernetes. Caby's Helm chart deploys the backend and frontend together behind one Ingress in a single release — the only piece you provide yourself is a valid [config file](/configuration/main-config).
-
-There are several ways to deploy Caby to Kubernetes. If you're not sure which to use we recommend going with [Helm](#helm).
+<Lede>
+  For most Kubernetes-based setups, we recommend deploying with our official <ExternalLink href="https://github.com/caby-io/caby/tree/main/charts/caby">Helm Chart</ExternalLink>. This page will walk you through how to deploy using Helm or plain Kubernetes manifests.
+</Lede>
 
 ## Helm
 
-Caby ships an official Helm chart, published as an OCI chart on GHCR.
+Caby's OCI chart is published to GHCR with every release:
+
+```
+oci://ghcr.io/caby-io/charts/caby
+```
 
 ### Prerequisites
 
 Before starting, ensure that you have:
 
 - A Kubernetes cluster,
-- [Helm](https://helm.sh) 3, and
+- <ExternalLink href="https://helm.sh">Helm 3</ExternalLink>, and
 - An Ingress controller (e.g. ingress-nginx, Traefik)
 
 ### Steps
 
 <Steps>
-  1. Create Caby's configuration file. You should reference the [config file](/configuration/main-config) page to see what values you can set. Here's an example of a starter setup with two spaces and a single user:
+  1. Create Caby's configuration file. See the [config file](/configuration/main-config) page for the full reference. Here's a minimal example with one space (`home`) and one user for our first deployment:
 
      ```yaml title="config.yaml"
      spaces:
        - name: home
          display: "🏠 Home"
-       - name: media
-         display: "🎞️ Media"
      users:
        - name: YOUR_USERNAME
          email: YOUR_USERNAME@example.com
@@ -42,21 +44,15 @@ Before starting, ensure that you have:
          spaces:
            - name: home
              permissions: "*"
-           - name: media
-             permissions: "*"
      ```
 
-     You should now have this file saved in your working directory:
+     Save this as `config.yaml`:
 
      <FileTree>
        - config.yaml
      </FileTree>
 
-     <Aside type="note">
-       No `urls` block needed here — the chart derives the backend and frontend URLs from `ingress.web.host` below, so they always match the deployment.
-     </Aside>
-
-  2. Publish `config.yaml` as a Secret named `caby-config`, however you manage secrets — `kubectl create secret`, sealed-secrets, external-secrets, or your own pipeline. For example, with kubectl:
+  2. There are a few ways to load this configuration into Caby. An easy way is through a Kubernetes secret. Create a namespace (`caby`) and a secret with our config from earlier:
 
      ```sh
      kubectl create namespace caby
@@ -66,11 +62,7 @@ Before starting, ensure that you have:
        -n caby
      ```
 
-     <Aside type="note">
-       The chart reads the file from the key named by `config.key` (default `config.yaml`) — keep the `--from-file=` key matching that, or set `config.key` to whatever key you used.
-     </Aside>
-
-  3. Install the chart, pointing `ingress.web.host` at your domain and `config.existingSecret` at the Secret from the previous step:
+  3. Figure out which [values](#values-reference) you need to set/override. At a minimum you must provide a valid `ingress.web.host` or disable the ingress. If you followed the previous steps you should also point the chart to your Secret in the same namespace:
 
      ```sh
      helm install caby oci://ghcr.io/caby-io/charts/caby \
@@ -79,7 +71,7 @@ Before starting, ensure that you have:
        --set config.existingSecret=caby-config
      ```
 
-  4. Watch the rollout:
+  4. Monitor the rollout:
 
      ```sh
      kubectl -n caby rollout status deploy/caby-service
@@ -89,21 +81,22 @@ Before starting, ensure that you have:
   5. Navigate to the activation page (e.g. [https://files.my-domain.com/activate](https://files.my-domain.com/activate)) to activate `YOUR_USERNAME` and set your password.
 </Steps>
 
-### Configuration reference
+### Values reference
 
-The values below cover the most common setup. For everything the chart supports, see [`values.yaml`](https://github.com/caby-io/caby/blob/main/charts/caby/values.yaml).
+The values below cover the most common setup. For everything the chart supports, see <ExternalLink href="https://github.com/caby-io/caby/blob/main/charts/caby/values.yaml">`values.yaml`</ExternalLink>.
 
-| Key (\* required)           | Default                                                                                                                                   | Description                                                                         |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `ingress.web.host` \*       | —                                                                                                                                         | Public hostname. Sets the web & API URL across the app (e.g. `example.caby.com`)    |
-| `config.existingSecret`     | `""`                                                                                                                                      | Bring your own config Secret (sealed-secrets, external-secrets, …).                 |
-| `config.inline`             | <a href="https://github.com/caby-io/caby/blob/main/charts/caby/values.yaml#L22-L33" target="_blank" rel="noopener noreferrer">default</a> | Rendered into a Secret unless `config.existingSecret` is set.                       |
-| `ingress.api.host`          | `""`                                                                                                                                      | Set to a distinct host for two-host mode; empty = single host, API on `/api`.       |
-| `ingress.tls`               | `true`                                                                                                                                    | Serve over https.                                                                   |
-| `ingress.tlsSecretName`     | `""`                                                                                                                                      | Falls back to `<release>-tls` when empty. Needed for setups such as wildcard certs. |
-| `persistence.size`          | `20Gi`                                                                                                                                    | Backend data PVC size.                                                              |
-| `persistence.existingClaim` | `""`                                                                                                                                      | Reuse an existing PVC instead of provisioning one.                                  |
-| `backend.secretEnv`         | `{}`                                                                                                                                      | Map of secret env (e.g. OIDC client secret).                                        |
+| Key (\* required)           | Default                                                                                                            | Description                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| `ingress.enabled`           | `true`                                                                                                             | Create an Ingress for the frontend/backend. Set to `false` to bring your own.       |
+| `ingress.web.host` \*       | *N/A*                                                                                                              | Public hostname. Sets the web & API URL across the app (e.g. `example.caby.com`)    |
+| `config.existingSecret`     | `""`                                                                                                               | Bring your own config Secret (sealed-secrets, external-secrets, …).                 |
+| `config.inline`             | <ExternalLink href="https://github.com/caby-io/caby/blob/main/charts/caby/values.yaml#L22-L33">q.v.</ExternalLink> | Rendered into a Secret unless `config.existingSecret` is set.                       |
+| `ingress.api.host`          | `""`                                                                                                               | Set to a distinct host for two-host mode; empty = single host, API on `/api`.       |
+| `ingress.tls`               | `true`                                                                                                             | Serve over https.                                                                   |
+| `ingress.tlsSecretName`     | `""`                                                                                                               | Falls back to `<release>-tls` when empty. Needed for setups such as wildcard certs. |
+| `persistence.size`          | `20Gi`                                                                                                             | Backend data PVC size.                                                              |
+| `persistence.existingClaim` | `""`                                                                                                               | Reuse an existing PVC instead of provisioning one.                                  |
+| `backend.secretEnv`         | `{}`                                                                                                               | Map of secret env (e.g. OIDC client secret).                                        |
 
 ## kubectl
 
@@ -118,7 +111,7 @@ For vanilla Kubernetes deployments you can generate plain manifests from the Hel
 Before starting, ensure that you have:
 
 - A Kubernetes cluster,
-- [Helm](https://helm.sh) 3 (used only to render manifests — nothing is installed as a release), and
+- <ExternalLink href="https://helm.sh">Helm</ExternalLink> 3 (used only to render manifests — nothing is installed as a release), and
 - kubectl
 
 ### Steps

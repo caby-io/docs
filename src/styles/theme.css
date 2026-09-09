@@ -61,6 +61,8 @@
   --clr-primary: oklch(81.14% 0.056 197.54);
   --clr-accent: oklch(75.85% 0.11 196.58);
   --box-shadow-0: 0 2px 0.3rem -1px var(--clr-shadow);
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
 
   /* lotus-ish layout widths */
   --sidebar-width: 15rem;

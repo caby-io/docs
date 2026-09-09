@@ -53,10 +53,10 @@ const { hasSidebar = false } = Astro.props;
     border-radius: 999px;
     background-color: transparent;
     transition:
-      background-color 0.2s ease,
-      border-color 0.2s ease,
-      box-shadow 0.2s ease,
-      backdrop-filter 0.2s ease;
+      background-color var(--transition-base),
+      border-color var(--transition-base),
+      box-shadow var(--transition-base),
+      backdrop-filter var(--transition-base);
   }
   :global(:root[data-nav-scrolled]) .header {
     border-color: var(--clr-border);
@@ -87,11 +87,14 @@ const { hasSidebar = false } = Astro.props;
     padding-inline: 0.3rem;
     margin-inline: -0.3rem;
     color: var(--sl-color-white);
-    font-size: var(--sl-text-sm);
+    font-size: var(--sl-text-base);
+    opacity: 0.85;
     font-weight: 600;
     white-space: nowrap;
     text-decoration: none;
-    transition: color 0.15s ease;
+    transition:
+      opacity var(--transition-fast),
+      color var(--transition-fast);
   }
   .top-nav a::after {
     content: "";
@@ -101,9 +104,10 @@ const { hasSidebar = false } = Astro.props;
     width: 0;
     height: 2px;
     background-color: var(--sl-color-accent-high);
-    transition: width 0.2s ease;
+    transition: width var(--transition-fast);
   }
   .top-nav a:hover {
+    opacity: 1;
     color: var(--sl-color-text-accent);
   }
   .top-nav a:hover::after {

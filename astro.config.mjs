@@ -2,6 +2,10 @@
 import { defineConfig } from "astro/config";
 import { fileURLToPath } from "node:url";
 import mdx from "@astrojs/mdx";
+import { unified } from "@astrojs/markdown-remark";
+import remarkDefinitionList, {
+  defListHastHandlers,
+} from "remark-definition-list";
 import icon from "astro-icon";
 import expressiveCode from "astro-expressive-code";
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
@@ -27,6 +31,12 @@ function pagefind() {
 
 export default defineConfig({
   site: "https://caby.io",
+  markdown: {
+    processor: unified({
+      remarkPlugins: [remarkDefinitionList],
+      remarkRehype: { handlers: { ...defListHastHandlers } },
+    }),
+  },
   vite: {
     // WSL2's inotify drops file-change events; polling keeps the dev watcher reliable.
     server: { watch: { usePolling: true } },

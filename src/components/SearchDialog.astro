@@ -140,6 +140,7 @@ import Icon from "./Icon.astro";
     color: var(--sl-color-gray-3);
     font-size: var(--sl-text-sm);
     cursor: pointer;
+    transition: color var(--transition-fast);
   }
   .search-trigger .label {
     margin-inline-end: auto;
@@ -222,8 +223,8 @@ import Icon from "./Icon.astro";
     color: var(--sl-color-gray-3);
     cursor: pointer;
     transition:
-      color 0.15s ease,
-      background-color 0.15s ease;
+      color var(--transition-fast),
+      background-color var(--transition-fast);
   }
   .box-close:hover {
     color: var(--sl-color-white);

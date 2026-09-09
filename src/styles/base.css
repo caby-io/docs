@@ -101,9 +101,17 @@ a {
   padding-inline-start: 1.25rem;
 }
 .prose li + li {
-  margin-top: 0.85rem;
+  margin-top: 0.5rem;
 }
 .prose li > :is(ul, ol) {
+  margin-top: 0.35rem;
+}
+
+.prose dt:not(:first-child) {
+  margin-top: 1rem;
+}
+.prose dd {
+  margin-inline-start: 1.25rem;
   margin-top: 0.35rem;
 }
 
@@ -167,6 +175,9 @@ a {
   border: 1px solid var(--sl-color-hairline);
   padding: 0.5rem 0.75rem;
   text-align: start;
+}
+.prose :is(th, td):nth-child(2) {
+  white-space: nowrap;
 }
 .prose th {
   color: var(--sl-color-white);

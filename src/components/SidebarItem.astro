@@ -50,8 +50,8 @@ const containsActive = (items: NavItem[]): boolean =>
     color: var(--sl-color-gray-3);
     line-height: 1.4;
     transition:
-      background-color 0.15s,
-      color 0.15s;
+      background-color var(--transition-fast),
+      color var(--transition-fast);
   }
   a:hover {
     color: var(--sl-color-white);
@@ -80,7 +80,7 @@ const containsActive = (items: NavItem[]): boolean =>
     color: var(--sl-color-gray-2);
     cursor: pointer;
     list-style: none;
-    transition: color 0.15s;
+    transition: color var(--transition-fast);
   }
   summary::-webkit-details-marker {
     display: none;
@@ -92,7 +92,7 @@ const containsActive = (items: NavItem[]): boolean =>
     flex-shrink: 0;
     width: 1rem;
     height: 1rem;
-    transition: transform 0.15s ease;
+    transition: transform var(--transition-fast);
   }
   .group[open] > summary .caret {
     transform: rotate(90deg);

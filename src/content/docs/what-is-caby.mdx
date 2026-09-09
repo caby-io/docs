@@ -21,24 +21,19 @@ Caby's goal is to be a part of making self-hosting accessible to everyone. To th
 
 Here are some examples of design decisions from these principles:
 
-- **Simple, Flat Files:**
+**Simple, Flat Files**
+:   Users' files are stored as they're sent. Storing plain files maximizes compatibility with other self-hosted apps or tools and works well with most home server infrastructure.
 
-  Users' files are stored as they're sent. Storing plain files maximizes compatibility with other self-hosted apps or tools and works well with most home server infrastructure.
+**No Backing Services**
+:   Caby's app state is held in plain files without the need for backing services (e.g. databases, caches, etc.). This reduces the blast-radius of corruption and makes it easy for a human (or their agent) to fix things when system data gets into a bad state.
 
-- **No Backing Services:**
+**Built-In Auth -> OIDC**
+:   Caby's built-in simple auth system is good enough for most light use-cases. For setups that require managing many users and roles, we actively steer admins towards delegating these requirements to an OIDC provider.
 
-  Caby's app state is held in plain files without the need for backing services (e.g. databases, caches, etc.). This reduces the blast-radius of corruption and makes it easy for a human (or their agent) to fix things when system data gets into a bad state.
+**Built-In Monitoring & Self-Healing** (in-progress)
+:   Caby runs background tasks that scan for issues and attempt to fix them automatically. If Caby can't resolve the problem itself, it surfaces it to the admin or user to step in as early as possible.
 
-- **Built-In Auth -> OIDC:**
-
-  Caby's built-in simple auth system is good enough for most light use-cases. For setups that require managing many users and roles, we actively steer admins towards delegating these requirements to an OIDC provider.
-
-- **Built-In Monitoring & Self-Healing:** (in-progress)
-
-  Caby runs background tasks that scan for issues and attempt to fix them automatically. If Caby can't resolve the problem itself, it surfaces it to the admin or user to step in as early as possible.
-
-- **Data Safety:** (in-progress)
-
-  Caby will ensure that information is not lost. For example, the file versioning and write queueing system will store two simultaneous changes to a file's history instead of just the last.
+**Data Safety** (in-progress)
+:   Caby will ensure that information is not lost. For example, the file versioning and write queueing system will store two simultaneous changes to a file's history instead of just the last.
 
 If this sounds like the right fit for your stack, head over to [Getting started](/getting-started) for deployment options.
