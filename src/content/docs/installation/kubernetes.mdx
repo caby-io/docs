@@ -1,7 +1,181 @@
 ---
 title: Kubernetes
-description: Deploy Caby to Kubernetes with kubectl.
+description: Deploy Caby to Kubernetes with Helm or kubectl.
 ---
 
-:::caution[Coming soon]
-:::
+import RandomizeTokens from '../../../components/RandomizeTokens.astro';
+
+<RandomizeTokens />
+
+<Lede>
+  For most Kubernetes-based setups, we recommend deploying with our official <ExternalLink href="https://github.com/caby-io/caby/tree/main/charts/caby">Helm Chart</ExternalLink>. This page will walk you through how to deploy using Helm or plain Kubernetes manifests.
+</Lede>
+
+## Helm
+
+Caby's OCI chart is published to GHCR with every release:
+
+```text
+oci://ghcr.io/caby-io/charts/caby
+```
+
+### Prerequisites
+
+Before starting, ensure that you have:
+
+- A Kubernetes cluster,
+- <ExternalLink href="https://helm.sh">Helm 3</ExternalLink>, and
+- kubectl
+
+### Steps
+
+<Steps>
+  1. Create Caby's configuration file. See the [config file](/configuration/main-config) page for the full reference. Here's a minimal example with one space (`home`) and one user for our first deployment:
+
+     ```yaml title="config.yaml"
+     spaces:
+       - name: home
+         display: "🏠 Home"
+     users:
+       - name: YOUR_USERNAME
+         # a unique 64-character token for first-time login
+         activation_token: REPLACE_WITH_A_UNIQUE_64_CHARACTER_TOKEN
+         spaces:
+           - name: home
+             permissions: "*"
+     ```
+
+     Save this as `config.yaml`:
+
+     <FileTree>
+       - config.yaml
+     </FileTree>
+
+  2. There are a few ways to load this configuration into Caby. An easy way is through a Kubernetes Secret. Create a namespace (`caby`) and a Secret with our config from earlier:
+
+     ```sh
+     kubectl create namespace caby
+
+     kubectl create secret generic caby-config \
+       --from-file=config.yaml=./config.yaml \
+       -n caby
+     ```
+
+  3. Determine which [Helm values](#values-reference) you need for your setup. At a minimum you must provide a valid `ingress.web.host` or disable the ingress with `ingress.enabled` set to `false`.
+
+     If you've followed the previous steps you should have a Secret in the same namespace as the deployment and can set it in your chart with `config.existingSecret`:
+
+     ```sh
+     helm install caby oci://ghcr.io/caby-io/charts/caby \
+       --namespace caby \
+       --set ingress.web.host=files.my-domain.com \
+       --set config.existingSecret=caby-config
+     ```
+
+  4. Watch the deployments come up:
+
+     ```sh
+     kubectl -n caby get deployments -w
+     ```
+
+  5. Once both deployments are ready, navigate to the activation page (e.g. `https://files.my-domain.com/activate`).
+</Steps>
+
+### Values reference
+
+The values below cover the most common setup. For everything the chart supports, see <ExternalLink href="https://github.com/caby-io/caby/blob/main/charts/caby/values.yaml">`values.yaml`</ExternalLink>.
+
+| Key                         | Default                                                                                                              | Description                                                                                                               |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `ingress.enabled`           | `true`                                                                                                               | Create an Ingress for the frontend/backend. Set to `false` to bring your own.                                             |
+| `ingress.web.host`          | *N/A*                                                                                                                | Public hostname. Sets the web & API URL across the app (e.g. `example.caby.com`). **Required if you enable the ingress.** |
+| `config.existingSecret`     | `""`                                                                                                                 | Bring your own config Secret (sealed-secrets, external-secrets, …).                                                       |
+| `config.inline`             | <ExternalLink href="https://github.com/caby-io/caby/blob/main/charts/caby/values.yaml">starter config</ExternalLink> | Rendered into a Secret unless `config.existingSecret` is set.                                                             |
+| `ingress.api.host`          | `""`                                                                                                                 | Set to a distinct host for two-host mode; empty = single host, API on `/api`.                                             |
+| `ingress.tls`               | `true`                                                                                                               | Serve over https.                                                                                                         |
+| `ingress.tlsSecretName`     | `""`                                                                                                                 | Falls back to `<release>-tls` when empty. Needed for setups such as wildcard certs.                                       |
+| `persistence.size`          | `20Gi`                                                                                                               | Backend data PVC size.                                                                                                    |
+| `persistence.existingClaim` | `""`                                                                                                                 | Reuse an existing PVC instead of provisioning one.                                                                        |
+| `backend.secretEnv`         | `{}`                                                                                                                 | Map of secret env (e.g. OIDC client secret).                                                                              |
+
+## kubectl
+
+<Aside type="tip" title="TODO">
+  Provide example manifests for vanilla K8s stack.
+</Aside>
+
+For vanilla Kubernetes deployments you can generate plain manifests from the Helm chart.
+
+### Prerequisites
+
+Before starting, ensure that you have:
+
+- A Kubernetes cluster,
+- <ExternalLink href="https://helm.sh">Helm 3</ExternalLink> (used to generate manifests until we have standalones), and
+- kubectl
+
+### Steps
+
+<Steps>
+  1. Create Caby's configuration file. See the [config file](/configuration/main-config) page for the full reference. Here's a minimal example with one space (`home`) and one user for our first deployment:
+
+     ```yaml title="config.yaml"
+     spaces:
+       - name: home
+         display: "🏠 Home"
+     users:
+       - name: YOUR_USERNAME
+         # a unique 64-character token for first-time login
+         activation_token: REPLACE_WITH_A_UNIQUE_64_CHARACTER_TOKEN
+         spaces:
+           - name: home
+             permissions: "*"
+     ```
+
+     Save this as `config.yaml`:
+
+     <FileTree>
+       - config.yaml
+     </FileTree>
+
+  2. Create a namespace (`caby`) and a Secret with the config from the previous step:
+
+     ```sh
+     kubectl create namespace caby
+
+     kubectl create secret generic caby-config \
+       --from-file=config.yaml=./config.yaml \
+       -n caby
+     ```
+
+  3. Render the chart to plain manifests. The same [values](#values-reference) apply, so at a minimum provide a valid `ingress.web.host` and point `config.existingSecret` at the Secret you just created:
+
+     ```sh
+     helm template caby oci://ghcr.io/caby-io/charts/caby \
+       --namespace caby \
+       --set ingress.web.host=files.my-domain.com \
+       --set config.existingSecret=caby-config \
+       > caby.yaml
+     ```
+
+     You should now have this file saved alongside `config.yaml`:
+
+     <FileTree>
+       - caby.yaml
+       - config.yaml
+     </FileTree>
+
+  4. Apply the manifests to the `caby` namespace:
+
+     ```sh
+     kubectl apply -n caby -f caby.yaml
+     ```
+
+  5. Watch the deployments come up:
+
+     ```sh
+     kubectl -n caby get deployments -w
+     ```
+
+  6. Once both deployments are ready, navigate to the activation page (e.g. `https://files.my-domain.com/activate`).
+</Steps>

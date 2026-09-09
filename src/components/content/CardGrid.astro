@@ -1,0 +1,18 @@
+---
+// no props; just a responsive grid wrapper around <Card> children.
+---
+
+<div class="card-grid"><slot /></div>
+
+<style>
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  @media (min-width: 50rem) {
+    .card-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

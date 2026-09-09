@@ -1,0 +1,23 @@
+---
+import Icon from "../Icon.astro";
+
+interface Props {
+  href: string;
+}
+
+const { href } = Astro.props;
+---
+
+<a href={href} target="_blank" rel="noopener noreferrer">
+  <slot /><Icon name="external" class="external-link-icon" />
+</a>
+
+<style>
+  :global(.external-link-icon) {
+    display: inline-block;
+    width: 0.8rem;
+    height: 0.8rem;
+    margin-inline-start: 0.2em;
+    vertical-align: 0.3em;
+  }
+</style>

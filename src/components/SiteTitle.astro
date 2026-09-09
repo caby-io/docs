@@ -1,0 +1,37 @@
+---
+import { site } from "../config/site";
+import cabyLogo from "../assets/caby-logo.svg?raw";
+
+// shared brand asset — byte-identical to the caby app; it's currentColor, so inline it
+// (an <img> can't inherit color) and strip the xml prolog for clean inline rendering
+const logo = cabyLogo.replace(/<\?xml[\s\S]*?\?>/, "");
+---
+
+<a href="/" class="site-title" aria-label={site.title}>
+  <span class="logo" aria-hidden="true" set:html={logo} />
+</a>
+
+<style>
+  .site-title {
+    display: inline-flex;
+    align-items: center;
+    opacity: 0.85;
+    transition: opacity var(--transition-fast);
+    /* colours the currentColor logo — matches the app's --clr-text-0 (light/dark) */
+    color: oklch(93.86% 0.011 196.97);
+  }
+  .site-title:hover {
+    opacity: 1;
+  }
+  :global([data-theme="light"]) .site-title {
+    color: oklch(21.68% 0.014 196.14);
+  }
+  .logo {
+    display: inline-flex;
+  }
+  .logo :global(svg) {
+    display: block;
+    height: 1.75rem;
+    width: auto;
+  }
+</style>

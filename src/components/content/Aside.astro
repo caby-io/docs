@@ -1,0 +1,84 @@
+---
+import Icon from "../Icon.astro";
+
+interface Props {
+  type?: "note" | "tip" | "caution" | "danger";
+  title?: string;
+}
+
+const { type = "note", title } = Astro.props;
+
+// each type → its icon; the hue comes from data-type in css.
+const icons = {
+  note: "info",
+  tip: "tip",
+  caution: "warning",
+  danger: "danger",
+} as const;
+
+const heading = title ?? type[0].toUpperCase() + type.slice(1);
+---
+
+<aside class="aside" data-type={type} aria-label={heading}>
+  <p class="aside-title">
+    <Icon name={icons[type]} class="aside-icon" size="1.15em" />
+    <span>{heading}</span>
+  </p>
+  <div class="aside-body"><slot /></div>
+</aside>
+
+<style>
+  .aside {
+    --hue: var(--sl-color-blue);
+    --hue-high: var(--sl-color-blue-high);
+    border-inline-start: 0.25rem solid var(--hue);
+    border-radius: 0.25rem;
+    padding: 1rem 1.25rem;
+    background-color: color-mix(in oklab, var(--hue) 12%, var(--sl-color-bg));
+    color: var(--sl-color-text);
+  }
+  .aside[data-type="tip"] {
+    --hue: var(--sl-color-purple);
+    --hue-high: var(--sl-color-purple-high);
+  }
+  .aside[data-type="caution"] {
+    --hue: var(--sl-color-orange);
+    --hue-high: var(--sl-color-orange-high);
+  }
+  .aside[data-type="danger"] {
+    --hue: var(--sl-color-red);
+    --hue-high: var(--sl-color-red-high);
+  }
+
+  .aside-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    line-height: var(--sl-line-height-headings);
+    color: var(--hue-high);
+  }
+  .aside-icon {
+    flex-shrink: 0;
+    color: var(--hue);
+  }
+
+  .aside-body {
+    margin-top: 0.5rem;
+    font-size: var(--sl-text-sm);
+  }
+  .aside-body:empty {
+    display: none;
+  }
+  .aside-body :global(> :first-child) {
+    margin-top: 0;
+  }
+  .aside-body :global(> :last-child) {
+    margin-bottom: 0;
+  }
+  .aside-body :global(a) {
+    color: var(--hue-high);
+  }
+</style>

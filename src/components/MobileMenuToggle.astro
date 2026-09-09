@@ -1,0 +1,59 @@
+---
+import Icon from "./Icon.astro";
+---
+
+<button
+  id="caby-menu-button"
+  class="menu-button"
+  popovertarget="caby-mobile-nav"
+  aria-label="Toggle navigation"
+>
+  <Icon name="bars" class="i-open" />
+  <Icon name="close" class="i-close" />
+</button>
+
+<script>
+  const btn = document.getElementById("caby-menu-button");
+  const drawer = document.getElementById("caby-mobile-nav");
+  drawer?.addEventListener("toggle", (e) => {
+    btn?.toggleAttribute("data-open", (e as ToggleEvent).newState === "open");
+  });
+</script>
+
+<style>
+  .menu-button {
+    position: fixed;
+    top: calc(
+      var(--nav-top-gap) + (var(--sl-nav-height) - var(--sl-menu-button-size)) /
+        2
+    );
+    inset-inline-end: var(--nav-pill-inset);
+    z-index: var(--sl-z-index-navbar);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--sl-menu-button-size);
+    height: var(--sl-menu-button-size);
+    padding: 0.4rem;
+    border: 1px solid var(--clr-border);
+    border-radius: 50%;
+    background-color: var(--clr-background-2);
+    color: var(--sl-color-white);
+    box-shadow: var(--box-shadow-0);
+    cursor: pointer;
+  }
+  .i-close {
+    display: none;
+  }
+  .menu-button[data-open] .i-open {
+    display: none;
+  }
+  .menu-button[data-open] .i-close {
+    display: block;
+  }
+  @media (min-width: 50rem) {
+    .menu-button {
+      display: none;
+    }
+  }
+</style>

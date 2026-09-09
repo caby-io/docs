@@ -1,0 +1,128 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+interface Props {
+  headings: Heading[];
+}
+const { headings } = Astro.props;
+const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+---
+
+{
+  toc.length > 0 && (
+    <nav class="toc" aria-label="On this page">
+      <p class="toc-title">On this page</p>
+      <ul>
+        <li class="toc-indicator" data-toc-indicator aria-hidden="true" />
+        {toc.map((h) => (
+          <li class={`depth-${h.depth}`}>
+            <a href={`#${h.slug}`} data-toc-link={h.slug}>
+              {h.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<script>
+  function initToc() {
+    const indicator = document.querySelector<HTMLElement>(
+      "[data-toc-indicator]",
+    );
+    const links = [
+      ...document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]"),
+    ];
+    if (!indicator || !links.length) return;
+    const headings = links
+      .map((l) => document.getElementById(l.dataset.tocLink!))
+      .filter((el): el is HTMLElement => !!el);
+    // activation line just below the fixed pill (> the headings' scroll-margin-top)
+    const line =
+      parseFloat(getComputedStyle(document.documentElement).fontSize) * 6.5;
+
+    const moveTo = (link: HTMLElement) => {
+      indicator.style.height = `${link.offsetHeight}px`;
+      indicator.style.transform = `translateY(${link.offsetTop}px)`;
+      indicator.setAttribute("data-visible", "");
+    };
+
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      let active = 0;
+      headings.forEach((h, i) => {
+        if (h.getBoundingClientRect().top <= line) active = i;
+      });
+      links.forEach((l, i) => l.toggleAttribute("data-active", i === active));
+      moveTo(links[active]);
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+  }
+  initToc();
+</script>
+
+<style>
+  .toc {
+    font-size: var(--sl-text-xs);
+  }
+  .toc-title {
+    margin: 0 0 0.5rem;
+    font-weight: 600;
+    color: var(--sl-color-white);
+    font-size: var(--sl-text-xs);
+  }
+  ul {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-inline-start: 1px solid var(--clr-border);
+  }
+  /* sliding accent bar, centred on the track line */
+  .toc-indicator {
+    position: absolute;
+    inset-inline-start: -1px;
+    top: 0;
+    width: 2px;
+    background: var(--sl-color-accent);
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 180ms ease,
+      height 180ms ease,
+      opacity 120ms ease;
+  }
+  .toc-indicator[data-visible] {
+    opacity: 1;
+  }
+  a {
+    display: block;
+    padding: 0.25rem 0 0.25rem 0.75rem;
+    color: var(--sl-color-gray-3);
+    line-height: 1.4;
+  }
+  .depth-3 a {
+    padding-inline-start: 1.5rem;
+  }
+  a:hover {
+    color: var(--sl-color-white);
+    text-decoration: none;
+  }
+  a[data-active] {
+    color: var(--sl-color-text-accent);
+  }
+</style>

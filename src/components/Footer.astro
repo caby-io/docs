@@ -1,0 +1,137 @@
+---
+import { site, sidebar, isGroup, type NavGroup } from "../config/site";
+import SiteTitle from "./SiteTitle.astro";
+import SocialIcons from "./SocialIcons.astro";
+
+const year = new Date().getFullYear();
+
+// doc link columns from the sidebar groups
+const columns = sidebar.filter(isGroup).map((g) => ({
+  label: (g as NavGroup).label,
+  links: (g as NavGroup).items.filter((i) => !isGroup(i)),
+}));
+---
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <SiteTitle />
+      <p class="tagline">{site.tagline}</p>
+      <SocialIcons />
+    </div>
+
+    <nav class="footer-cols" aria-label="Footer">
+      {
+        columns.map((col) => (
+          <div class="footer-col">
+            <h2>{col.label}</h2>
+            <ul>
+              {col.links.map((l) => (
+                <li>
+                  <a href={(l as { link: string }).link}>{l.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+      <div class="footer-col">
+        <h2>Community</h2>
+        <ul>
+          <li>
+            <a href={site.github} target="_blank" rel="noopener noreferrer"
+              >GitHub</a
+            >
+          </li>
+          <li>
+            <a href={site.discord} target="_blank" rel="noopener noreferrer"
+              >Discord</a
+            >
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© {year} Caby. Self-hosted file management.</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: 5rem;
+    border-top: 1px solid var(--clr-border);
+    background-color: var(--sl-color-bg-nav);
+  }
+  .footer-inner {
+    max-width: var(--nav-width);
+    margin-inline: auto;
+    padding: 3.5rem var(--sl-content-pad-x) 2.5rem;
+    display: grid;
+    gap: 3rem;
+  }
+  @media (min-width: 50rem) {
+    .footer-inner {
+      grid-template-columns: 1.4fr 2fr;
+      gap: 4rem;
+    }
+  }
+
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .footer-brand .tagline {
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+    max-width: 22rem;
+  }
+
+  .footer-cols {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+  @media (min-width: 50rem) {
+    .footer-cols {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  .footer-col h2 {
+    margin: 0 0 0.75rem;
+    font-size: var(--sl-text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--sl-color-white);
+  }
+  .footer-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .footer-col a {
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+  }
+  .footer-col a:hover {
+    color: var(--sl-color-text-accent);
+  }
+
+  .footer-bottom {
+    border-top: 1px solid var(--clr-border);
+  }
+  .footer-bottom p {
+    max-width: var(--nav-width);
+    margin-inline: auto;
+    padding: 1.25rem var(--sl-content-pad-x);
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+  }
+</style>

@@ -1,0 +1,67 @@
+---
+// numbers a slotted markdown <ol> as a stepper: css counter for the circle
+// markers, a connector line down their centres, content in the right column.
+---
+
+<div class="steps"><slot /></div>
+
+<style>
+  .steps > :global(ol) {
+    counter-reset: step;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* --marker: circle diameter; content sits one gutter to its right. */
+  .steps > :global(ol) > :global(li) {
+    --marker: 1.75rem;
+    position: relative;
+    counter-increment: step;
+    padding-inline-start: calc(var(--marker) + 1rem);
+    padding-bottom: 1rem;
+  }
+  .steps > :global(ol) > :global(li:last-child) {
+    padding-bottom: 0;
+  }
+
+  /* numbered circle */
+  .steps > :global(ol) > :global(li)::before {
+    content: counter(step);
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--marker);
+    height: var(--marker);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 999px;
+    background-color: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* connector, centred under the circle; hidden on the last step */
+  .steps > :global(ol) > :global(li)::after {
+    content: "";
+    position: absolute;
+    inset-inline-start: calc(var(--marker) / 2);
+    top: var(--marker);
+    bottom: 0;
+    width: 1px;
+    background-color: var(--sl-color-hairline-light);
+    transform: translateX(-0.5px);
+  }
+  .steps > :global(ol) > :global(li:last-child)::after {
+    display: none;
+  }
+
+  /* tighten the first block so its text aligns with the circle */
+  .steps > :global(ol) > :global(li) > :global(:first-child) {
+    margin-top: 0;
+  }
+</style>

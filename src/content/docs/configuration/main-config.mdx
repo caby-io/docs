@@ -3,7 +3,6 @@ title: Main Config
 description: Configure Caby's spaces and users in the main config file.
 ---
 
-import { Badge } from '@astrojs/starlight/components';
 import RandomizeTokens from '../../../components/RandomizeTokens.astro';
 
 <RandomizeTokens />
@@ -13,9 +12,9 @@ You'll need to configure spaces and users:
 - Spaces represent compartments of files to help you organize by purpose or access.
 - Users, of course, help us give people access to those spaces.
 
-:::caution
-The main config file is in active development and unstable at the moment. Some of these fields don't do anything and others will likely move or be renamed. Keep an eye on this page between updates to stay on top of those changes.
-:::
+<Aside type="caution">
+  The main config file is in active development and unstable at the moment. Some of these fields don't do anything and others will likely move or be renamed. Keep an eye on this page between updates to stay on top of those changes.
+</Aside>
 
 ```yaml title="config.yaml"
 urls:
@@ -71,5 +70,4 @@ auth:
 
 ### Manual OIDC config <Badge text="TODO" variant="caution" />
 
-:::caution[Coming soon]
-:::
+<Aside type="caution" title="Coming soon" />

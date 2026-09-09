@@ -1,0 +1,51 @@
+---
+import "../styles/tokens.css";
+import "../styles/theme.css";
+import "../styles/base.css";
+import { site } from "../config/site";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
+const fullTitle = title === site.title ? title : `${title} — ${site.title}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/inter-latin-wght-normal.woff2"
+      crossorigin="anonymous"
+    />
+    <script is:inline>
+      // set the theme before paint (no flash)
+      (() => {
+        try {
+          const t = localStorage.getItem("caby-theme");
+          document.documentElement.dataset.theme =
+            t === "light" || t === "dark"
+              ? t
+              : matchMedia("(prefers-color-scheme: light)").matches
+                ? "light"
+                : "dark";
+        } catch {
+          document.documentElement.dataset.theme = "dark";
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

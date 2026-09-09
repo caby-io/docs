@@ -1,0 +1,79 @@
+---
+// file tree from a slotted markdown <ul>. folder vs file is decided in css:
+// a nested list (li:has(> ul)) is a dir; the script also flags leaf dirs written
+// with a trailing slash and trims that slash. icons are masked pseudo-elements
+// (same lucide file/folder paths as Icon.astro) so no per-<li> render is needed.
+---
+
+<file-tree class="file-tree"><slot /></file-tree>
+
+<script>
+  class FileTree extends HTMLElement {
+    constructor() {
+      super();
+      this.querySelectorAll("li").forEach((li) => {
+        const label = li.firstChild;
+        if (label?.nodeType !== Node.TEXT_NODE) return;
+        const text = label.textContent ?? "";
+        if (text.trimEnd().endsWith("/")) {
+          li.classList.add("dir");
+          label.textContent = text.replace(/\/\s*$/, "");
+        }
+      });
+    }
+  }
+  customElements.define("file-tree", FileTree);
+</script>
+
+<style>
+  /* same glass panel as the code blocks */
+  .file-tree {
+    display: block;
+    border: 1px solid var(--code-border);
+    border-radius: var(--code-radius);
+    padding: 0.75rem 1rem;
+    background-color: var(--code-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    font-family: var(--sl-font-mono);
+    font-size: var(--sl-text-sm);
+    line-height: 1.9;
+  }
+
+  .file-tree :global(ul) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* indent guide for nested levels */
+  .file-tree :global(li li) {
+    padding-inline-start: 1rem;
+    border-inline-start: 1px solid var(--sl-color-hairline-light);
+    margin-inline-start: 0.5rem;
+  }
+
+  .file-tree :global(li) {
+    position: relative;
+    padding-inline-start: 1.5rem;
+  }
+  /* leading icon: file by default, folder for a dir (nested list or flagged) */
+  .file-tree :global(li)::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0.45em;
+    width: 1rem;
+    height: 1rem;
+    background-color: var(--sl-color-gray-3);
+    mask: var(--file) center / contain no-repeat;
+  }
+  .file-tree :global(li.dir)::before,
+  .file-tree :global(li):has(> ul)::before {
+    background-color: var(--sl-color-text-accent);
+    mask-image: var(--folder);
+  }
+
+  .file-tree {
+    --file: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z'/%3E%3Cpath d='M14 2v4a2 2 0 0 0 2 2h4'/%3E%3C/svg%3E");
+    --folder: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z'/%3E%3C/svg%3E");
+  }
+</style>

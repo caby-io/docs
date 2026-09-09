@@ -1,0 +1,67 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import "../styles/hero.css";
+
+interface HeroAction {
+  text: string;
+  link: string;
+  variant?: "primary" | "secondary";
+}
+interface Props {
+  title: string;
+  description?: string;
+  hero?: {
+    tagline?: string;
+    image?: { html: string };
+    actions?: HeroAction[];
+  };
+}
+const { title, description, hero } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <Header hasSidebar={false} />
+
+  <main class="splash">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="splash-inner">
+      {
+        hero && (
+          <section class="hero">
+            <div class="hero-copy">
+              <h1>{title}</h1>
+              {hero.tagline && <p class="tagline" set:html={hero.tagline} />}
+              {hero.actions && hero.actions.length > 0 && (
+                <div class="actions">
+                  {hero.actions.map((a) => {
+                    const external = /^https?:\/\//.test(a.link);
+                    return (
+                      <a
+                        href={a.link}
+                        class:list={["button", a.variant ?? "primary"]}
+                        {...(external
+                          ? { target: "_blank", rel: "noopener noreferrer" }
+                          : {})}
+                      >
+                        {a.text}
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            {hero.image?.html && (
+              <div class="hero-image" set:html={hero.image.html} />
+            )}
+          </section>
+        )
+      }
+
+      <div class="splash-content prose"><slot /></div>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

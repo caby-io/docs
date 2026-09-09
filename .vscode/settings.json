@@ -1,0 +1,21 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  "[markdown]": {
+    "editor.defaultFormatter": "unifiedjs.vscode-remark",
+    "editor.wordWrap": "on"
+  },
+  "[mdx]": {
+    "editor.formatOnSave": false,
+    "editor.wordWrap": "on"
+  },
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": "\\.mdx$",
+        "cmd": "pnpm exec remark \"${file}\" --quiet --output"
+      }
+    ]
+  }
+}

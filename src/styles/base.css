@@ -1,0 +1,227 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  /* constant scrollbar gutter so the centered pill doesn't shift between pages */
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: var(--sl-font);
+  font-size: var(--sl-text-base);
+  line-height: var(--sl-line-height);
+  color: var(--sl-color-text);
+  background-color: var(--sl-color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: var(--sl-color-text-accent);
+  text-decoration: none;
+}
+
+:where(a):hover {
+  text-decoration: underline;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sl-color-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ---- prose: rendered mdx content ---- */
+.prose {
+  color: var(--sl-color-text);
+  font-size: var(--sl-text-base);
+  line-height: var(--sl-line-height);
+}
+
+.prose > * + * {
+  margin-top: 1rem;
+}
+.prose li > * + * {
+  margin-top: 0.35rem;
+}
+
+.prose :is(h1, h2, h3, h4, h5) {
+  color: var(--sl-color-white);
+  line-height: var(--sl-line-height-headings);
+  font-weight: 600;
+  /* clear the fixed pill when jumping to an anchor */
+  scroll-margin-top: calc(var(--sl-nav-height) + var(--nav-top-gap) + 1rem);
+}
+
+.prose h1 {
+  font-size: var(--sl-text-h1);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.prose h2 {
+  font-size: var(--sl-text-h2);
+  margin-top: 2.5rem;
+  padding-bottom: 0.3rem;
+}
+.prose h3 {
+  font-size: var(--sl-text-h3);
+  margin-top: 2rem;
+}
+.prose h4 {
+  font-size: var(--sl-text-h4);
+  margin-top: 1.5rem;
+}
+
+.prose :is(ul, ol) {
+  padding-inline-start: 1.25rem;
+}
+.prose li + li {
+  margin-top: 0.5rem;
+}
+.prose li > :is(ul, ol) {
+  margin-top: 0.35rem;
+}
+
+.prose dt:not(:first-child) {
+  margin-top: 1rem;
+}
+.prose dd {
+  margin-inline-start: 1.25rem;
+  margin-top: 0.35rem;
+}
+
+/* small emoji-like glyph inline before a list item / word */
+.prose .inline-icon {
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  margin-inline-end: 0.35em;
+  vertical-align: -0.2em;
+  color: var(--sl-color-text-accent);
+}
+.prose .inline-icon.icon-green {
+  color: var(--sl-color-green);
+}
+.prose .inline-icon.icon-orange {
+  color: var(--sl-color-orange);
+}
+.prose .inline-icon.icon-blue {
+  color: var(--sl-color-accent);
+}
+
+.prose strong {
+  color: var(--sl-color-white);
+  font-weight: 600;
+}
+
+.prose blockquote {
+  border-inline-start: 2px solid var(--sl-color-gray-5);
+  padding-inline-start: 1rem;
+  color: var(--sl-color-gray-3);
+}
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--clr-border);
+  margin: 2rem 0;
+}
+
+/* inline code (fenced blocks are handled by expressive code) */
+.prose :not(pre) > code {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-code-sm);
+  background-color: var(--sl-color-bg-inline-code);
+  border-radius: 0.25rem;
+  padding: 0.15em 0.4em;
+}
+
+.prose :is(h1, h2, h3, h4, h5) > code {
+  background: none;
+  padding: 0;
+}
+
+.prose table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: var(--sl-text-sm);
+}
+.prose :is(th, td) {
+  border: 1px solid var(--sl-color-hairline);
+  padding: 0.5rem 0.75rem;
+  text-align: start;
+}
+.prose :is(th, td):nth-child(2) {
+  white-space: nowrap;
+}
+.prose th {
+  color: var(--sl-color-white);
+  background-color: var(--sl-color-gray-6);
+  font-weight: 600;
+}
+
+.prose img {
+  border-radius: 0.5rem;
+}
+
+/* glass code frames — the translucent bg comes from expressive-code's
+   styleOverrides (--code-bg); this adds the blur the pill has */
+.expressive-code .frame {
+  backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--code-radius);
+  overflow: hidden;
+}
+
+.expressive-code pre {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sl-color-gray-5) transparent;
+}
+.expressive-code pre::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.expressive-code pre::-webkit-scrollbar-thumb {
+  background: var(--sl-color-gray-5);
+  border-radius: 3px;
+}
+
+.expressive-code figcaption .title > svg {
+  display: inline-block;
+  width: 1.25em;
+  height: 1.25em;
+  margin-inline-end: 0.45em;
+  vertical-align: -0.28em;
+}
+
+/* block spacing around code / file trees, incl. when nested in steps */
+.prose :is(.expressive-code, .file-tree) {
+  margin-block: 1.25rem;
+}
+.prose .steps :is(.expressive-code, .file-tree) {
+  margin-block: 0.75rem;
+}

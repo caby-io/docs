@@ -1,0 +1,147 @@
+---
+import Icon from "./Icon.astro";
+
+const MODES = [
+  { value: "auto", icon: "desktop", label: "System" },
+  { value: "light", icon: "sun", label: "Light" },
+  { value: "dark", icon: "moon", label: "Dark" },
+] as const;
+
+// unique per instance so the header's radios and the mobile drawer's radios
+// aren't merged into one native group
+const groupName = `theme-${crypto.randomUUID()}`;
+---
+
+<theme-toggle class="theme-toggle" role="radiogroup" aria-label="Select theme">
+  {
+    MODES.map(({ value, icon, label }) => (
+      <label class="theme-toggle-option">
+        <input
+          type="radio"
+          name={groupName}
+          value={value}
+          checked={value === "auto"}
+        />
+        <Icon name={icon} />
+        <span class="sr-only">{label}</span>
+      </label>
+    ))
+  }
+</theme-toggle>
+
+<script>
+  type Theme = "auto" | "dark" | "light";
+  const storageKey = "caby-theme";
+
+  const parse = (t: unknown): Theme =>
+    t === "auto" || t === "dark" || t === "light" ? t : "auto";
+  const load = (): Theme =>
+    parse(
+      typeof localStorage !== "undefined" && localStorage.getItem(storageKey),
+    );
+  const store = (t: Theme) => {
+    try {
+      localStorage.setItem(storageKey, t === "light" || t === "dark" ? t : "");
+    } catch {}
+  };
+  const preferred = (): Theme =>
+    matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+
+  function apply(theme: Theme) {
+    document
+      .querySelectorAll<HTMLInputElement>('theme-toggle input[type="radio"]')
+      .forEach((i) => {
+        i.checked = i.value === theme;
+      });
+    document.documentElement.dataset.theme =
+      theme === "auto" ? preferred() : theme;
+    store(theme);
+  }
+
+  matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => {
+    if (load() === "auto") apply("auto");
+  });
+
+  class ThemeToggle extends HTMLElement {
+    constructor() {
+      super();
+      apply(load());
+      this.querySelectorAll<HTMLInputElement>('input[type="radio"]').forEach(
+        (input) => {
+          input.addEventListener("change", () => {
+            if (input.checked) apply(parse(input.value));
+          });
+        },
+      );
+    }
+  }
+  customElements.define("theme-toggle", ThemeToggle);
+</script>
+
+<style>
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.125rem;
+    padding: 0.1875rem;
+    border-radius: 999px;
+    border: 1px solid var(--clr-border);
+    background-color: var(--clr-background-2);
+  }
+  .theme-toggle-option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 999px;
+    color: var(--sl-color-gray-3);
+    cursor: pointer;
+    transition:
+      background-color var(--transition-fast),
+      color var(--transition-fast);
+  }
+  .theme-toggle-option :global(svg) {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  .theme-toggle-option:has(input[value="light"]) :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+  .theme-toggle-option:hover {
+    color: var(--sl-color-white);
+  }
+  .theme-toggle-option:has(input:checked) {
+    background-color: color-mix(
+      in oklab,
+      var(--sl-color-accent) 25%,
+      transparent
+    );
+    color: var(--sl-color-text-accent);
+  }
+  .theme-toggle-option:has(input:focus-visible) {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+  .theme-toggle-option input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+</style>
