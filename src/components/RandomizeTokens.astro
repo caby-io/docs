@@ -16,6 +16,9 @@
   }
 
   function randomizeTokens() {
+    // one token per load: a block's rendered text and its copy button must agree
+    const token = randomToken();
+
     const walker = document.createTreeWalker(
       document.body,
       NodeFilter.SHOW_TEXT,
@@ -27,9 +30,17 @@
         targets.push(node);
     }
     for (const target of targets) {
-      target.nodeValue = target.nodeValue.replaceAll(PLACEHOLDER, () =>
-        randomToken(),
-      );
+      target.nodeValue = target.nodeValue.replaceAll(PLACEHOLDER, () => token);
+    }
+
+    // expressive-code's copy button holds its own payload, which the walker never visits
+    for (const button of document.querySelectorAll("button[data-code]")) {
+      const code = button.getAttribute("data-code");
+      if (code?.includes(PLACEHOLDER))
+        button.setAttribute(
+          "data-code",
+          code.replaceAll(PLACEHOLDER, () => token),
+        );
     }
   }
 

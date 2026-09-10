@@ -7,15 +7,20 @@ import RandomizeTokens from '../../../components/RandomizeTokens.astro';
 
 <RandomizeTokens />
 
-A Caby deployment can be broken into three basic parts:
+<Lede>
+  For most Docker-based setups, we recommend deploying with Docker Compose. This page will walk you through how to deploy using Docker Compose or the Docker CLI.
+</Lede>
 
-1. The backend service,
-2. The frontend service, and
-3. A valid [config file](/configuration/main-config)
+A Caby deployment has two parts: the backend service and the frontend web app. Container images for both are published to GitHub's container registry with every release:
 
-There are several ways to deploy Caby using Docker. If you're not sure which to use we recommend going with [Docker Compose](#docker-compose).
+```text
+ghcr.io/caby-io/caby-service
+ghcr.io/caby-io/caby-web
+```
 
 ## Docker Compose
+
+Caby ships a starter `compose.yaml` and `config.yaml` which we will use to deploy with Docker Compose.
 
 ### Prerequisites
 
@@ -27,44 +32,29 @@ Before starting, ensure that you have:
 ### Steps
 
 <Steps>
-  1. Create the two files Caby needs in an empty working directory:
+  1. Create a clean directory and fetch the starter `compose.yaml` and `config.yaml`:
 
      ```sh
-     touch config.yaml compose.yaml
+     mkdir caby && cd caby
+
+     curl -fO "https://raw.githubusercontent.com/caby-io/caby/main/docker/{compose,config}.yaml"
      ```
 
-     You should now have both files side by side:
+     Your new directory should have two files:
 
      <FileTree>
-       - compose.yaml
-       - config.yaml
+       - caby
+         - compose.yaml
+         - config.yaml
      </FileTree>
 
-  2. Decide where Caby stores its files.
-
-     In most cases you'll want to share the files Caby manages with other applications, so they need to live somewhere other containers can reach. You could bind-mount a local directory to the backend:
-
-     ```yaml
-     services:
-       caby-service:
-         volumes:
-           - /srv/cabynet-files:/app/cabynet
-     ```
-
-     For this guide we'll use a named volume that any other container can mount. Create it:
-
-     ```sh
-     docker volume create cabynet
-     ```
-
-  3. Define the backend and frontend services in `compose.yaml`:
+  2. Review `compose.yaml`. It defines the two services, the volume Caby stores everything in, and a read-only mount for your config:
 
      ```yaml title="compose.yaml"
      services:
        # backend service
        caby-service:
-         image: ghcr.io/caby-io/caby-service:edge
-         # keep the backend in a startup loop while we prep the config
+         image: ghcr.io/caby-io/caby-service:0.1.0
          restart: unless-stopped
          ports:
            - "8080:8080"
@@ -76,37 +66,47 @@ Before starting, ensure that you have:
 
        # frontend service
        caby-web:
-         image: ghcr.io/caby-io/caby-web:edge
+         image: ghcr.io/caby-io/caby-web:0.1.0
          restart: unless-stopped
          ports:
            - "3000:3000"
          environment:
-           # needs to point to the API's public URL
-           PUBLIC_API_BASE: https://files-api.my-domain.com/v0
+           # needs to point to the API's public URL + /v0
+           PUBLIC_API_BASE: http://localhost:8080/v0
 
      volumes:
        cabynet:
-         external: true
      ```
 
-  4. Fill in `config.yaml`.
+     `cabynet` is a named volume — storage Docker creates and manages for you. It works as-is, and any other container can mount it to share Caby's files. If you'd rather keep those files in a folder you can browse on the host, point the volume at a directory instead:
 
-     See the [config file](/configuration/main-config) page for the available options. Here's an example of a starter setup with two spaces and a single user:
+     ```yaml title="compose.yaml"
+     services:
+       caby-service:
+         volumes:
+           - /srv/cabynet-files:/app/cabynet
+     ```
+
+  3. Review `config.yaml`. See the [config file](/configuration/main-config) page for the full reference. The starter sets the localhost URLs, two spaces (`home` and `media`), and a single user with access to both:
 
      ```yaml title="config.yaml"
      urls:
-       backend: https://files-api.my-domain.com
-       frontend: https://files.my-domain.com
+       # Where your backend server is exposed (e.g. https://files-api.caby.net)
+       backend: http://localhost:8080
+       # Where your frontend server is exposed (e.g. https://files.caby.net)
+       frontend: http://localhost:3000
+
+     # A list of spaces or compartments
      spaces:
        - name: home
          display: "🏠 Home"
        - name: media
          display: "🎞️ Media"
+
      users:
-       - name: caby_guy
-         email: caby_guy@caby.io
-         # a unique 64-character token for first-time login
-         activation_token: REPLACE_WITH_A_UNIQUE_64_CHARACTER_TOKEN
+       - name: caby_user
+         # a token for first-time login — generate one with `openssl rand -hex 32`
+         activation_token: REPLACE_ME
          spaces:
            - name: home
              permissions: "*"
@@ -114,11 +114,45 @@ Before starting, ensure that you have:
              permissions: "*"
      ```
 
+  4. Open `config.yaml` and replace `REPLACE_ME` with a unique 64-character activation token. Here's a fresh one, generated in your browser:
+
+     ```text
+     REPLACE_WITH_A_UNIQUE_64_CHARACTER_TOKEN
+     ```
+
+     If you'd rather not edit the file by hand, generate a token and drop it in with one command:
+
+     ```sh
+     # Unix
+     sed -i "s/REPLACE_ME/$(openssl rand -hex 32)/" config.yaml
+     ```
+
+     ```sh
+     # macOS
+     sed -i '' "s/REPLACE_ME/$(openssl rand -hex 32)/" config.yaml
+     ```
+
+     Either way, keep the token handy — you'll need it in the last step. You can always read it back out:
+
+     ```sh
+     grep activation_token config.yaml
+     ```
+
   5. Deploy the stack:
 
      ```sh
-     docker compose up
+     docker compose up -d
      ```
+
+  6. Watch the services come up:
+
+     ```sh
+     docker compose ps
+     ```
+
+     If either service doesn't reach a running state, check its logs with `docker compose logs caby-service`.
+
+  7. Once both services are running, navigate to the activation page at `http://localhost:3000/activate` to activate `caby_user` and set a password. You can skip pasting the token in by passing it in the URL instead: `http://localhost:3000/activate?activation_token=YOUR_TOKEN`.
 </Steps>
 
 ## Docker CLI
@@ -134,22 +168,41 @@ Before starting, ensure that you have:
 ### Steps
 
 <Steps>
-  1. Create Caby's configuration file. You should reference the [config file](/configuration/main-config) page to see what values you can set. Here's an example of a starter setup with two spaces and a single user:
+  1. Make a directory for Caby and download the starter config into it:
+
+     ```sh
+     mkdir caby && cd caby
+
+     curl -fO https://raw.githubusercontent.com/caby-io/caby/main/docker/config.yaml
+     ```
+
+     You should now have this file saved in your working directory:
+
+     <FileTree>
+       - caby
+         - config.yaml
+     </FileTree>
+
+     See the [config file](/configuration/main-config) page for the full reference. The starter sets the localhost URLs, two spaces (`home` and `media`), and a single user with access to both:
 
      ```yaml title="config.yaml"
      urls:
-       backend: https://files-api.my-domain.com
-       frontend: https://files.my-domain.com
+       # Where your backend server is exposed (e.g. https://files-api.caby.net)
+       backend: http://localhost:8080
+       # Where your frontend server is exposed (e.g. https://files.caby.net)
+       frontend: http://localhost:3000
+
+     # A list of spaces or compartments
      spaces:
        - name: home
          display: "🏠 Home"
        - name: media
          display: "🎞️ Media"
+
      users:
-       - name: caby_guy
-         email: caby_guy@caby.io
-         # a unique 64-character token for first-time login
-         activation_token: REPLACE_WITH_A_UNIQUE_64_CHARACTER_TOKEN
+       - name: caby_user
+         # a token for first-time login — generate one with `openssl rand -hex 32`
+         activation_token: REPLACE_ME
          spaces:
            - name: home
              permissions: "*"
@@ -157,32 +210,115 @@ Before starting, ensure that you have:
              permissions: "*"
      ```
 
-     You should now have this file saved in your working directory:
+  2. Open `config.yaml` and replace `REPLACE_ME` with a unique 64-character activation token. Here's a fresh one, generated in your browser:
 
-     <FileTree>
-       - config.yaml
-     </FileTree>
+     ```text
+     REPLACE_WITH_A_UNIQUE_64_CHARACTER_TOKEN
+     ```
 
-  2. Run the backend service in the background:
+     If you'd rather not edit the file by hand, generate a token and drop it in with one command:
+
+     ```sh
+     # Unix
+     sed -i "s/REPLACE_ME/$(openssl rand -hex 32)/" config.yaml
+     ```
+
+     ```sh
+     # macOS
+     sed -i '' "s/REPLACE_ME/$(openssl rand -hex 32)/" config.yaml
+     ```
+
+     Either way, keep the token handy — you'll need it in the last step. You can always read it back out:
+
+     ```sh
+     grep activation_token config.yaml
+     ```
+
+  3. Create the volume Caby stores everything in. A named volume can be mounted by any other container:
+
+     ```sh
+     docker volume create cabynet
+     ```
+
+  4. Run the backend service in the background:
 
      ```sh
      docker run -d \
        --name caby-service \
        -p 8080:8080 \
-       -v "$(pwd)/cabynet:/app/cabynet" \
+       -v cabynet:/app/cabynet \
        -v "$(pwd)/config.yaml:/app/cabynet/config.yaml:ro" \
        --restart unless-stopped \
-       ghcr.io/caby-io/caby-service:edge
+       ghcr.io/caby-io/caby-service:0.1.0
      ```
 
-  3. Run the frontend service in the background:
+  5. Run the frontend service in the background:
 
      ```sh
      docker run -d \
        --name caby-web \
        -p 3000:3000 \
-       -e PUBLIC_API_BASE=https://files-api.my-domain.com/v0 \
+       -e PUBLIC_API_BASE=http://localhost:8080/v0 \
        --restart unless-stopped \
-       ghcr.io/caby-io/caby-web:edge
+       ghcr.io/caby-io/caby-web:0.1.0
      ```
+
+  6. Check that both containers are running:
+
+     ```sh
+     docker ps
+     ```
+
+     If either container isn't running, check its logs with `docker logs caby-service`.
+
+  7. Once both containers are running, navigate to the activation page at `http://localhost:3000/activate` to activate `caby_user` and set a password. You can skip pasting the token in by passing it in the URL instead: `http://localhost:3000/activate?activation_token=YOUR_TOKEN`.
 </Steps>
+
+## Use your own domain
+
+The starter files serve Caby on `localhost`. To reach it at a hostname instead, put a reverse proxy in front of both services and update three values.
+
+In `config.yaml`, point Caby at its public URLs. Leave the API version off `backend` — Caby appends it:
+
+```yaml title="config.yaml"
+urls:
+  backend: https://files-api.my-domain.com
+  frontend: https://files.my-domain.com
+```
+
+In `compose.yaml`, point the frontend at the API's public URL. This one *does* include the API version:
+
+```yaml title="compose.yaml"
+services:
+  caby-web:
+    environment:
+      PUBLIC_API_BASE: https://files-api.my-domain.com/v0
+```
+
+<Aside type="caution">
+  `PUBLIC_API_BASE` is read by the browser, not by the frontend container. A service name like `http://caby-service:8080/v0` resolves inside the Compose network but fails in the browser — it has to be a URL your users can reach.
+</Aside>
+
+Then recreate the stack:
+
+```sh
+docker compose up -d
+```
+
+Your activation page now lives on the frontend host (e.g. `https://files.my-domain.com/activate`).
+
+## Reference
+
+The settings below cover the most common setup. For everything the config file supports, see the [config file](/configuration/main-config) page.
+
+| Setting           | Default                                     | Description                                                              |
+| ----------------- | ------------------------------------------- | ------------------------------------------------------------------------ |
+| Backend image     | `ghcr.io/caby-io/caby-service`              | Published on every release. The `edge` tag tracks `main`.                |
+| Frontend image    | `ghcr.io/caby-io/caby-web`                  | Published alongside the backend, on the same tags.                       |
+| Backend port      | `8080`                                      | Serves the API, versioned under `/v0`.                                   |
+| Frontend port     | `3000`                                      | Serves the web UI. Override with `PORT` on the frontend.                 |
+| Data volume       | `cabynet:/app/cabynet`                      | Everything Caby stores: files, users, and shares.                        |
+| Config mount      | `./config.yaml:/app/cabynet/config.yaml:ro` | The main config. Caby only needs read access to it.                      |
+| `PUBLIC_API_BASE` | `http://localhost:8080/v0`                  | The API URL **as the browser reaches it**. Must include the API version. |
+| `urls.backend`    | `http://localhost:8080`                     | Public backend URL, set in `config.yaml`. Excludes the API version.      |
+| `urls.frontend`   | `http://localhost:3000`                     | Public frontend URL, set in `config.yaml`.                               |
