@@ -48,48 +48,76 @@ Before starting, ensure that you have:
          - config.yaml
      </FileTree>
 
-  2. Review `compose.yaml`. It defines the two services, the volume Caby stores everything in, and a read-only mount for your config:
+  2. Open `compose.yaml` to review or modify any values for your setup. You can also reference the extended version for more options:
 
-     ```yaml title="compose.yaml"
-     services:
-       # backend service
-       caby-service:
-         image: ghcr.io/caby-io/caby-service:0.1.0
-         restart: unless-stopped
-         ports:
-           - "8080:8080"
-         volumes:
-           # everything (files, users, shares, ...) is saved here
-           - cabynet:/app/cabynet
-           # the main configuration. Caby only needs read access to this
-           - ./config.yaml:/app/cabynet/config.yaml:ro
+     <CodeTabs labels={["compose.yaml", "compose.yaml (extended)"]}>
+       ```yaml title="compose.yaml"
+       services:
+         # backend service
+         caby-service:
+           image: ghcr.io/caby-io/caby-service:0.1.0
+           restart: unless-stopped
+           ports:
+             - "8080:8080"
+           volumes:
+             # everything (files, users, shares, ...) is saved here
+             - cabynet:/app/cabynet
+             # the main configuration. Caby only needs read access to this
+             - ./config.yaml:/app/cabynet/config.yaml:ro
 
-       # frontend service
-       caby-web:
-         image: ghcr.io/caby-io/caby-web:0.1.0
-         restart: unless-stopped
-         ports:
-           - "3000:3000"
-         environment:
-           # needs to point to the API's public URL + /v0
-           PUBLIC_API_BASE: http://localhost:8080/v0
+         # frontend service
+         caby-web:
+           image: ghcr.io/caby-io/caby-web:0.1.0
+           restart: unless-stopped
+           ports:
+             - "3000:3000"
+           environment:
+             # needs to point to the API's public URL + /v0
+             PUBLIC_API_BASE: http://localhost:8080/v0
 
-     volumes:
-       cabynet:
-     ```
+       volumes:
+         cabynet:
+       ```
 
-     `cabynet` is a named volume — storage Docker creates and manages for you. It works as-is, and any other container can mount it to share Caby's files. If you'd rather keep those files in a folder you can browse on the host, point the volume at a directory instead:
+       ```yaml title="compose.yaml" "https://files-api.my-domain.com/v0"
+       services:
+         # backend service
+         caby-service:
+           image: ghcr.io/caby-io/caby-service:0.1.0
+           restart: unless-stopped
+           ports:
+             - "8080:8080"
+           volumes:
+             # this is pointing to a volume managed by Docker
+             - cabynet:/app/cabynet
+             # we could also just mount a local directory
+             # - /srv/cabynet:/app/cabynet
+             # or multiple
+             # - /mnt/home:/app/cabynet/spaces/home
+             # - /mnt/media:/app/cabynet/spaces/media
 
-     ```yaml title="compose.yaml"
-     services:
-       caby-service:
-         volumes:
-           - /srv/cabynet-files:/app/cabynet
-     ```
+             - ./config.yaml:/app/cabynet/config.yaml:ro
 
-  3. Review `config.yaml`. See the [config file](/configuration/main-config) page for the full reference. The starter sets the localhost URLs, two spaces (`home` and `media`), and a single user with access to both:
+         # frontend service
+         caby-web:
+           image: ghcr.io/caby-io/caby-web:0.1.0
+           restart: unless-stopped
+           ports:
+             - "3000:3000"
+           environment:
+             # this should point to where caby-service is reachable from the browser
+             # don't forget the /v0
+             PUBLIC_API_BASE: https://files-api.my-domain.com/v0
 
-     ```yaml title="config.yaml"
+       # if you mount /app/cabynet yourself you don't need this
+       volumes:
+         cabynet:
+       ```
+     </CodeTabs>
+
+  3. Next, open `config.yaml` and review or modify the configuration for your setup:
+
+     ```yaml title="config.yaml" "http://localhost:8080" "http://localhost:3000" "caby_user" "REPLACE_ME"
      urls:
        # Where your backend server is exposed (e.g. https://files-api.caby.net)
        backend: http://localhost:8080
@@ -113,6 +141,8 @@ Before starting, ensure that you have:
            - name: media
              permissions: "*"
      ```
+
+     For a full reference of Caby's config please see the [config file](/configuration/main-config) page.
 
   4. Open `config.yaml` and replace `REPLACE_ME` with a unique 64-character activation token. Here's a fresh one, generated in your browser:
 

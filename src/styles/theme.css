@@ -73,11 +73,13 @@
      shared by expressive code and file trees */
   --glass-blur: 2px;
   --code-bg: color-mix(in oklab, var(--sl-color-bg-nav) 10%, transparent);
+  --code-header-bg: color-mix(in oklab, var(--sl-color-bg-nav) 40%, transparent);
   --code-border: var(--clr-border);
   --code-radius: 0.5rem;
 
   /* faint grid backdrop shared by the splash hero and doc heroes */
   --grid-line: var(--sl-color-white);
+  --grid-opacity: 0.03;
   --grid-size: 48px;
   --grid-image:
     linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
@@ -100,4 +102,8 @@
   --clr-background-2: oklch(0.96 0.01 200.85);
   --clr-primary: oklch(47.76% 0.057 197.01);
   --clr-accent: oklch(71.06% 0.107 197.35);
+  --grid-opacity: 0.05;
+
+  /* near-white bg-nav barely reads on a light body, so build the header off a real grey */
+  --code-header-bg: color-mix(in oklab, var(--sl-color-gray-5) 45%, transparent);
 }

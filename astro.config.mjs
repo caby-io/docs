@@ -86,7 +86,7 @@ export default defineConfig({
           terminalTitlebarBorderBottomColor: "var(--code-border)",
           editorActiveTabIndicatorTopColor: "transparent",
           editorActiveTabIndicatorBottomColor: "var(--sl-color-accent)",
-          frameBoxShadowCssValue: "var(--box-shadow-0)",
+          frameBoxShadowCssValue: "none",
         },
       },
     }),

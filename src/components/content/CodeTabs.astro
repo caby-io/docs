@@ -1,0 +1,156 @@
+---
+// one editor frame holding several code blocks as switchable tabs. each child
+// block keeps its own expressive-code frame; we hide their captions and draw a
+// single shared tab bar so the group reads as one editor.
+interface Props {
+  labels: string[];
+}
+
+const { labels } = Astro.props;
+---
+
+<code-tabs class="code-tabs">
+  <div class="tab-bar" role="tablist">
+    {
+      labels.map((label, i) => (
+        <button
+          type="button"
+          role="tab"
+          class="tab"
+          aria-selected={i === 0 ? "true" : "false"}
+          tabindex={i === 0 ? 0 : -1}
+        >
+          <span class="tab-label">{label}</span>
+        </button>
+      ))
+    }
+  </div>
+  <div class="panels"><slot /></div>
+</code-tabs>
+
+<script>
+  class CodeTabs extends HTMLElement {
+    connectedCallback() {
+      const tabs = [...this.querySelectorAll<HTMLButtonElement>(".tab")];
+      const panels = [
+        ...this.querySelectorAll<HTMLElement>(":scope > .panels > *"),
+      ];
+      if (!tabs.length || tabs.length !== panels.length) return;
+
+      panels.forEach((panel, i) => {
+        panel.setAttribute("role", "tabpanel");
+        panel.hidden = i !== 0;
+        // lift each block's file icon into its tab so the bar reads like an editor
+        const icon = panel.querySelector("figcaption .title > svg");
+        if (icon) tabs[i].prepend(icon.cloneNode(true));
+      });
+
+      const select = (index: number) => {
+        tabs.forEach((tab, i) => {
+          const active = i === index;
+          tab.setAttribute("aria-selected", active ? "true" : "false");
+          tab.tabIndex = active ? 0 : -1;
+          panels[i].hidden = !active;
+        });
+      };
+
+      tabs.forEach((tab, i) => {
+        tab.addEventListener("click", () => select(i));
+        tab.addEventListener("keydown", (event) => {
+          const step =
+            event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+          if (!step) return;
+          event.preventDefault();
+          const next = (i + step + tabs.length) % tabs.length;
+          select(next);
+          tabs[next].focus();
+        });
+      });
+    }
+  }
+  customElements.define("code-tabs", CodeTabs);
+</script>
+
+<style>
+  /* mirrors .expressive-code .frame in base.css so the group matches a lone block */
+  .code-tabs {
+    display: block;
+    margin-block: 1.25rem;
+    border: 1px solid var(--code-border);
+    border-radius: var(--code-radius);
+    background-color: var(--code-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    overflow: hidden;
+  }
+
+  .tab-bar {
+    display: flex;
+    /* --code-header-bg is referenced by astro.config but never defined; keep a fallback */
+    background-color: var(
+      --code-header-bg,
+      color-mix(in oklab, var(--sl-color-bg-nav) 18%, transparent)
+    );
+    border-block-end: 1px solid var(--code-border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tab-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+    flex: none;
+    appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 0.5rem 0.9rem;
+    color: var(--sl-color-gray-3);
+    font-family: var(--sl-font-mono);
+    font-size: var(--sl-text-xs);
+    line-height: 1.4;
+    cursor: pointer;
+  }
+  .tab:hover {
+    color: var(--sl-color-white);
+  }
+  .tab[aria-selected="true"] {
+    background-color: var(--code-bg);
+    color: var(--sl-color-white);
+  }
+  /* accent underline, same as expressive-code's active editor tab */
+  .tab[aria-selected="true"]::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 1px;
+    background-color: var(--sl-color-accent);
+  }
+  .tab :global(svg) {
+    width: 1.15em;
+    height: 1.15em;
+    flex: none;
+  }
+
+  /* the outer wrapper owns the chrome, so strip it from each nested block */
+  .panels :global(.expressive-code) {
+    margin-block: 0;
+  }
+  .panels :global(figure.frame) {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+  /* expressive-code's own caption, at (0,5,0) thanks to :not(.is-terminal).
+     match its shape so these win — a shorter selector silently loses. */
+  .panels :global(.expressive-code .frame.has-title:not(.is-terminal) .header),
+  .panels :global(.expressive-code .frame.is-terminal .header) {
+    display: none;
+  }
+</style>
