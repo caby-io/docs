@@ -160,6 +160,10 @@ a {
   padding: 0.15em 0.4em;
 }
 
+.prose :is(h1, h2, h3, h4, h5) > code {
+  padding-inline: 0.25em;
+}
+
 .prose table {
   display: block;
   overflow-x: auto;
