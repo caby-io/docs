@@ -1,0 +1,121 @@
+---
+// gives every code block holding the token placeholder its own fresh token per
+// load, plus a regenerate button beside expressive-code's copy button. blocks are
+// independent: re-rolling one leaves the others alone. no-js fallback is the
+// placeholder text, which expressive-code already hides the buttons for.
+---
+
+<script>
+  const PLACEHOLDER = "REPLACE_WITH_A_UNIQUE_64_CHARACTER_TOKEN";
+  const CHARS =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const ICON_SVG =
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'><path d='M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8'/><path d='M21 3v5h-5'/><path d='M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16'/><path d='M3 21v-5h5'/></svg>";
+  const ICON = `url("data:image/svg+xml,${encodeURIComponent(ICON_SVG)}")`;
+
+  type Targets = {
+    text: { node: Node; template: string }[];
+    buttons: { button: Element; template: string }[];
+  };
+
+  function randomToken(length = 64) {
+    const values = crypto.getRandomValues(new Uint32Array(length));
+    let token = "";
+    for (let i = 0; i < length; i++) token += CHARS[values[i] % CHARS.length];
+    return token;
+  }
+
+  // keep what each spot was rendered from, so a re-roll is a fresh render rather
+  // than a swap of whatever token is on screen
+  function findTargets(figure: Element): Targets | null {
+    const walker = document.createTreeWalker(figure, NodeFilter.SHOW_TEXT);
+    const text: Targets["text"] = [];
+    let node: Node | null;
+    while ((node = walker.nextNode())) {
+      const value = node.nodeValue;
+      if (value?.includes(PLACEHOLDER)) text.push({ node, template: value });
+    }
+    if (!text.length) return null;
+
+    // expressive-code's copy button holds its own payload, which the walker never visits
+    const buttons: Targets["buttons"] = [];
+    for (const button of figure.querySelectorAll("button[data-code]")) {
+      const code = button.getAttribute("data-code");
+      if (code?.includes(PLACEHOLDER)) buttons.push({ button, template: code });
+    }
+    return { text, buttons };
+  }
+
+  function render(targets: Targets, token: string) {
+    for (const { node, template } of targets.text)
+      node.nodeValue = template.replaceAll(PLACEHOLDER, () => token);
+    for (const { button, template } of targets.buttons)
+      button.setAttribute(
+        "data-code",
+        template.replaceAll(PLACEHOLDER, () => token),
+      );
+  }
+
+  function addRegenerateButton(figure: Element, targets: Targets) {
+    const copy = figure.querySelector(".copy");
+    if (!copy || copy.querySelector(".regenerate")) return;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "regenerate";
+    button.title = "Generate a new token";
+    button.setAttribute("aria-label", "Generate a new token");
+    // the icon is a mask on ::after, so swapping the variable is the whole restyle
+    button.style.setProperty("--ec-frm-copyIcon", ICON);
+    // expressive-code's button background layer
+    button.append(document.createElement("div"));
+
+    button.addEventListener("click", (event) => {
+      // if view transitions are ever enabled, expressive-code rebinds every
+      // .copy button on page-load — including this one. registering first wins
+      event.stopImmediatePropagation();
+      render(targets, randomToken());
+      showFeedback(copy, button, "Generated!");
+    });
+
+    copy.insertBefore(button, copy.querySelector("button"));
+  }
+
+  // mirrors expressive-code's copy tooltip, down to the timings, so both buttons
+  // report the same way. it lives in the aria-live region, which announces it too
+  function showFeedback(copy: Element, button: HTMLElement, message: string) {
+    const live = copy.querySelector("[aria-live]");
+    if (!live || copy.querySelector(".feedback")) return;
+
+    const tooltip = document.createElement("div");
+    tooltip.classList.add("feedback");
+    tooltip.append(message);
+    live.append(tooltip);
+
+    tooltip.offsetWidth; // flush the starting state so the transition runs
+    requestAnimationFrame(() => tooltip.classList.add("show"));
+
+    const hide = () => tooltip.classList.remove("show");
+    const remove = () => {
+      if (parseFloat(getComputedStyle(tooltip).opacity) > 0) return;
+      tooltip.remove();
+    };
+    setTimeout(hide, 1500);
+    setTimeout(remove, 2500);
+    button.addEventListener("blur", hide);
+    tooltip.addEventListener("transitionend", remove);
+    tooltip.addEventListener("transitioncancel", remove);
+  }
+
+  function setUpTokens() {
+    for (const figure of document.querySelectorAll(".expressive-code figure")) {
+      const targets = findTargets(figure);
+      if (!targets) continue;
+      render(targets, randomToken());
+      addRegenerateButton(figure, targets);
+    }
+  }
+
+  setUpTokens();
+  document.addEventListener("astro:page-load", setUpTokens);
+</script>

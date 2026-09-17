@@ -44,11 +44,22 @@
     padding: 0;
     list-style: none;
   }
-  /* indent guide for nested levels */
+  /* indent guide descends from under the parent folder icon; inset a touch
+     top and bottom so it doesn't run the full height of the list */
+  .file-tree :global(ul ul) {
+    position: relative;
+    margin-inline-start: -1rem;
+  }
+  .file-tree :global(ul ul)::before {
+    content: "";
+    position: absolute;
+    inset-block: 0.4rem;
+    inset-inline-start: -0.1rem;
+    width: 2px;
+    background: var(--sl-color-gray-6);
+  }
   .file-tree :global(li li) {
-    padding-inline-start: 1rem;
-    border-inline-start: 1px solid var(--sl-color-hairline-light);
-    margin-inline-start: 0.5rem;
+    padding-inline-start: 1.75rem;
   }
 
   .file-tree :global(li) {
@@ -68,12 +79,16 @@
   }
   .file-tree :global(li.dir)::before,
   .file-tree :global(li):has(> ul)::before {
-    background-color: var(--sl-color-text-accent);
+    background-color: var(--sl-color-gray-2);
     mask-image: var(--folder);
+  }
+  /* nudge nested icons clear of the guide */
+  .file-tree :global(li li)::before {
+    inset-inline-start: 0.5rem;
   }
 
   .file-tree {
     --file: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z'/%3E%3Cpath d='M14 2v4a2 2 0 0 0 2 2h4'/%3E%3C/svg%3E");
-    --folder: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z'/%3E%3C/svg%3E");
+    --folder: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2'/%3E%3C/svg%3E");
   }
 </style>

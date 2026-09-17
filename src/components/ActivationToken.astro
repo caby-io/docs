@@ -1,0 +1,12 @@
+---
+// a code block holding a freshly generated activation token, with copy and
+// regenerate buttons. <Code> is expressive-code's own renderer, so the frame is a
+// real code block rather than a lookalike; the script fills it and adds the button.
+import { Code } from "astro-expressive-code/components";
+import ActivationTokenScript from "./ActivationTokenScript.astro";
+
+const PLACEHOLDER = "REPLACE_WITH_A_UNIQUE_64_CHARACTER_TOKEN";
+---
+
+<Code code={PLACEHOLDER} lang="text" />
+<ActivationTokenScript />

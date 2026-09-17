@@ -3,9 +3,9 @@ title: Main Config
 description: Configure Caby's spaces and users in the main config file.
 ---
 
-import RandomizeTokens from '../../../components/RandomizeTokens.astro';
+import ActivationTokenScript from '../../../components/ActivationTokenScript.astro';
 
-<RandomizeTokens />
+<ActivationTokenScript />
 
 You'll need to configure spaces and users:
 
@@ -40,7 +40,7 @@ users:
     # an optional email for the user
     email: caby_guy@caby.io
     # 64-character string used to activate the user's account on first login;
-    # generate a unique random token per user (do not reuse this example)
+    # use a unique random token per user
     activation_token: REPLACE_WITH_A_UNIQUE_64_CHARACTER_TOKEN
     # the spaces this user should have access to
     spaces:
