@@ -154,15 +154,10 @@ a {
 /* inline code (fenced blocks are handled by expressive code) */
 .prose :not(pre) > code {
   font-family: var(--sl-font-mono);
-  font-size: var(--sl-text-code-sm);
+  font-size: 0.85em;
   background-color: var(--sl-color-bg-inline-code);
   border-radius: 0.25rem;
   padding: 0.15em 0.4em;
-}
-
-.prose :is(h1, h2, h3, h4, h5) > code {
-  background: none;
-  padding: 0;
 }
 
 .prose table {
