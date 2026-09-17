@@ -162,11 +162,7 @@ Before starting, ensure that you have:
        ```
      </CodeTabs>
 
-     Either way, keep the token handy — you'll need it in the last step. You can always read it back out:
-
-     ```sh
-     grep activation_token config.yaml
-     ```
+     Keep your account's activation token handy since we'll need it to log in the first time.
 
   5. Deploy the stack:
 
@@ -182,7 +178,7 @@ Before starting, ensure that you have:
 
      If either service doesn't reach a running state, check its logs with `docker compose logs caby-service`.
 
-  7. Once both services are running, navigate to the activation page at `http://localhost:3000/activate` to activate `caby_user` and set a password. You can skip pasting the token in by passing it in the URL instead: `http://localhost:3000/activate?activation_token=YOUR_TOKEN`.
+  7. Once both services are running, navigate to the activation page (e.g. `http://localhost:3000/activate`) and paste your activation code to activate your account.
 </Steps>
 
 ## Docker CLI
