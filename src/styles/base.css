@@ -212,16 +212,16 @@ a {
 
 .expressive-code figcaption .title > svg {
   display: inline-block;
-  width: 1.25em;
-  height: 1.25em;
+  width: 1.45em;
+  height: 1.45em;
   margin-inline-end: 0.45em;
-  vertical-align: -0.28em;
+  vertical-align: -0.38em;
 }
 
-/* block spacing around code / file trees, incl. when nested in steps */
-.prose :is(.expressive-code, .file-tree) {
-  margin-block: 1.25rem;
+/* block spacing around components, wherever they're nested */
+.prose :is(.expressive-code, .code-tabs, .file-tree, .aside, .card-grid, table) {
+  margin-block: var(--block-gap);
 }
-.prose .steps :is(.expressive-code, .file-tree) {
-  margin-block: 0.75rem;
+.prose .steps {
+  --block-gap: 0.75rem;
 }

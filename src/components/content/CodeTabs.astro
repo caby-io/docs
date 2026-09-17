@@ -75,7 +75,6 @@ const { labels } = Astro.props;
   /* mirrors .expressive-code .frame in base.css so the group matches a lone block */
   .code-tabs {
     display: block;
-    margin-block: 1.25rem;
     border: 1px solid var(--code-border);
     border-radius: var(--code-radius);
     background-color: var(--code-bg);
@@ -131,8 +130,10 @@ const { labels } = Astro.props;
     background-color: var(--sl-color-accent);
   }
   .tab :global(svg) {
-    width: 1.15em;
-    height: 1.15em;
+    width: 1.6em;
+    height: 1.6em;
+    /* taller than the label's line; don't let it grow the bar */
+    margin-block: -0.1em;
     flex: none;
   }
 
@@ -152,5 +153,10 @@ const { labels } = Astro.props;
   .panels :global(.expressive-code .frame.has-title:not(.is-terminal) .header),
   .panels :global(.expressive-code .frame.is-terminal .header) {
     display: none;
+  }
+  /* titled frames push the copy button below that caption; reset to the untitled offset */
+  .panels :global(.expressive-code .frame.has-title:not(.is-terminal)),
+  .panels :global(.expressive-code .frame.is-terminal) {
+    --button-spacing: 0.4rem;
   }
 </style>

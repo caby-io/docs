@@ -133,7 +133,7 @@ Before starting, ensure that you have:
 
      users:
        - name: caby_user
-         # a token for first-time login — generate one with `openssl rand -hex 32`
+         # token for first-time login, generate with `openssl rand -hex 32`
          activation_token: REPLACE_ME
          spaces:
            - name: home
@@ -150,17 +150,17 @@ Before starting, ensure that you have:
      REPLACE_WITH_A_UNIQUE_64_CHARACTER_TOKEN
      ```
 
-     If you'd rather not edit the file by hand, generate a token and drop it in with one command:
+     You can also replace it with a command:
 
-     ```sh
-     # Unix
-     sed -i "s/REPLACE_ME/$(openssl rand -hex 32)/" config.yaml
-     ```
+     <CodeTabs labels={["Linux", "macOS"]}>
+       ```sh
+       sed -i "s/REPLACE_ME/$(openssl rand -hex 32)/" config.yaml
+       ```
 
-     ```sh
-     # macOS
-     sed -i '' "s/REPLACE_ME/$(openssl rand -hex 32)/" config.yaml
-     ```
+       ```sh
+       sed -i '' "s/REPLACE_ME/$(openssl rand -hex 32)/" config.yaml
+       ```
+     </CodeTabs>
 
      Either way, keep the token handy — you'll need it in the last step. You can always read it back out:
 
@@ -248,15 +248,15 @@ Before starting, ensure that you have:
 
      If you'd rather not edit the file by hand, generate a token and drop it in with one command:
 
-     ```sh
-     # Unix
-     sed -i "s/REPLACE_ME/$(openssl rand -hex 32)/" config.yaml
-     ```
+     <CodeTabs labels={["Linux", "macOS"]}>
+       ```sh
+       sed -i "s/REPLACE_ME/$(openssl rand -hex 32)/" config.yaml
+       ```
 
-     ```sh
-     # macOS
-     sed -i '' "s/REPLACE_ME/$(openssl rand -hex 32)/" config.yaml
-     ```
+       ```sh
+       sed -i '' "s/REPLACE_ME/$(openssl rand -hex 32)/" config.yaml
+       ```
+     </CodeTabs>
 
      Either way, keep the token handy — you'll need it in the last step. You can always read it back out:
 

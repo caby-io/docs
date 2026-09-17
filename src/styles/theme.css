@@ -68,6 +68,8 @@
   --sidebar-width: 15rem;
   --toc-width: 12rem;
   --doc-col-gap: 2.5rem;
+  /* space around block components in prose; steps tighten it */
+  --block-gap: 1.25rem;
 
   /* code panel — same glass material as the nav pill (translucent bg-nav + blur),
      shared by expressive code and file trees */
