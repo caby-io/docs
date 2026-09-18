@@ -13,7 +13,7 @@ import ActivationTokenScript from '../../../components/ActivationTokenScript.ast
 
 ## Helm
 
-Caby's OCI chart is published to GHCR with every release:
+Caby's OCI chart is published to GHCR with every release, versioned to match the Caby release it ships:
 
 ```text
 oci://ghcr.io/caby-io/charts/caby
@@ -67,6 +67,7 @@ Before starting, ensure that you have:
 
      ```sh
      helm install caby oci://ghcr.io/caby-io/charts/caby \
+       --version %CABY_VERSION% \
        --namespace caby \
        --set ingress.web.host=files.my-domain.com \
        --set config.existingSecret=caby-config
@@ -152,6 +153,7 @@ Before starting, ensure that you have:
 
      ```sh
      helm template caby oci://ghcr.io/caby-io/charts/caby \
+       --version %CABY_VERSION% \
        --namespace caby \
        --set ingress.web.host=files.my-domain.com \
        --set config.existingSecret=caby-config \

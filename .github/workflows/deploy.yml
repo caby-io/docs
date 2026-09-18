@@ -4,6 +4,16 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      version:
+        description: Pin a caby version (defaults to caby's latest release)
+        required: false
+  # called by check-caby-version.yml when caby's latest release changes
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: false
 
 permissions:
   contents: read
@@ -29,7 +39,16 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # deploys resolve the version here rather than in the build; a pinned
+      # input (rollback, or the version check's result) wins over the lookup
+      - id: version
+        uses: ./.github/actions/caby-version
+        with:
+          pinned: ${{ inputs.version }}
+
       - run: pnpm build
+        env:
+          CABY_VERSION: ${{ steps.version.outputs.version }}
 
       - uses: actions/configure-pages@v5
 

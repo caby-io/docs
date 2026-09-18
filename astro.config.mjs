@@ -6,6 +6,14 @@ import { unified } from "@astrojs/markdown-remark";
 import remarkDefinitionList, {
   defListHastHandlers,
 } from "remark-definition-list";
+import remarkCabyVersions from "./src/plugins/remark-caby-versions.mjs";
+import { resolveCabyVersion } from "./src/config/caby-version.mjs";
+
+// resolved once per build, not stored in the repo — see src/config/caby-version.mjs.
+// logged so a deploy's run log records which version it published.
+const cabyVersion = await resolveCabyVersion({
+  log: (line) => console.log(`[caby-version] ${line}`),
+});
 import icon from "astro-icon";
 import expressiveCode from "astro-expressive-code";
 
@@ -31,7 +39,11 @@ export default defineConfig({
   site: "https://caby.io",
   markdown: {
     processor: unified({
-      remarkPlugins: [remarkDefinitionList],
+      // versions first: %CABY_VERSION% resolves before anything else reads the text
+      remarkPlugins: [
+        [remarkCabyVersions, { version: cabyVersion }],
+        remarkDefinitionList,
+      ],
       remarkRehype: { handlers: { ...defListHastHandlers } },
     }),
   },

@@ -75,7 +75,11 @@
      shared by expressive code and file trees */
   --glass-blur: 2px;
   --code-bg: color-mix(in oklab, var(--sl-color-bg-nav) 10%, transparent);
-  --code-header-bg: color-mix(in oklab, var(--sl-color-bg-nav) 40%, transparent);
+  --code-header-bg: color-mix(
+    in oklab,
+    var(--sl-color-bg-nav) 40%,
+    transparent
+  );
   --code-border: var(--clr-border);
   --code-radius: 0.5rem;
 
@@ -107,5 +111,9 @@
   --grid-opacity: 0.05;
 
   /* near-white bg-nav barely reads on a light body, so build the header off a real grey */
-  --code-header-bg: color-mix(in oklab, var(--sl-color-gray-5) 45%, transparent);
+  --code-header-bg: color-mix(
+    in oklab,
+    var(--sl-color-gray-5) 45%,
+    transparent
+  );
 }
