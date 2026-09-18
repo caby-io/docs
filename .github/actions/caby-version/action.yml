@@ -1,0 +1,54 @@
+name: Resolve caby version
+description: The newest version published to ghcr as both images and the helm chart.
+
+inputs:
+  pinned:
+    description: Use this version instead of looking one up
+    required: false
+
+outputs:
+  version:
+    description: The caby version the docs should advertise
+    value: ${{ steps.resolve.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - id: resolve
+      shell: bash
+      env:
+        PINNED: ${{ inputs.pinned }}
+      run: |
+        set -euo pipefail
+
+        # anonymous pull token per artifact — the same datasource renovate reads, and the
+        # reason this never advertises a tag users can't pull
+        tags() {
+          local repo="$1" token
+          token=$(curl -sf --max-time 20 \
+            "https://ghcr.io/token?scope=repository:${repo}:pull&service=ghcr.io" | jq -r '.token')
+          # tags come back in lexical order, so digits land on the first page ahead of `edge`
+          curl -sf --max-time 20 -H "authorization: Bearer $token" \
+            "https://ghcr.io/v2/${repo}/tags/list?n=100" \
+            | jq -r '.tags[]? | select(test("^[0-9]+\\.[0-9]+\\.[0-9]+$"))' | sort
+        }
+
+        version="${PINNED:-}"
+        if [ -z "$version" ]; then
+          # the newest version where every artifact a user pulls is actually published
+          version=$(tags caby-io/caby-service \
+            | comm -12 - <(tags caby-io/caby-web) \
+            | comm -12 - <(tags caby-io/charts/caby) \
+            | sort -V | tail -1)
+        fi
+
+        if [ -z "$version" ]; then
+          echo "::error::no version is published as both images and chart yet"
+          for repo in caby-io/caby-service caby-io/caby-web caby-io/charts/caby; do
+            echo "  $repo: $(tags "$repo" | tr '\n' ' ')"
+          done
+          exit 1
+        fi
+
+        echo "caby $version"
+        echo "version=$version" >> "$GITHUB_OUTPUT"

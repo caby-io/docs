@@ -218,7 +218,8 @@ a {
 }
 
 /* block spacing around components, wherever they're nested */
-.prose :is(.expressive-code, .code-tabs, .file-tree, .aside, .card-grid, table) {
+.prose
+  :is(.expressive-code, .code-tabs, .file-tree, .aside, .card-grid, table) {
   margin-block: var(--block-gap);
 }
 .prose .steps {

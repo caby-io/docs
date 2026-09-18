@@ -1,0 +1,58 @@
+name: Check caby version
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+  # caby's release job can make this immediate, once its images and chart are pushed:
+  #   gh api repos/caby-io/docs/dispatches -f event_type=caby-release
+  repository_dispatch:
+    types: [caby-release]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: caby-version
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      changed: ${{ steps.check.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: caby
+        uses: ./.github/actions/caby-version
+
+      - id: check
+        env:
+          VERSION: ${{ steps.caby.outputs.version }}
+        run: |
+          version="$VERSION"
+
+          # the published page is the state — nothing stored here can drift from it
+          live=$(curl -sL --max-time 20 https://caby.io/installation/docker/ \
+            | grep -oE 'caby-service:[0-9]+\.[0-9]+\.[0-9]+' \
+            | head -1 | cut -d: -f2) || live=""
+
+          echo "latest release $version, live site ${live:-unknown}"
+          # an unreadable live version deploys anyway: a redundant deploy beats a stale site
+          if [ "$live" = "$version" ]; then changed=false; else changed=true; fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: check
+    if: needs.check.outputs.changed == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
+    with:
+      version: ${{ needs.check.outputs.version }}

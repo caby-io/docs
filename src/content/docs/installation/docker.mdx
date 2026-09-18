@@ -46,7 +46,7 @@ Before starting, ensure that you have:
        services:
          # backend service
          caby-service:
-           image: ghcr.io/caby-io/caby-service:0.1.0
+           image: ghcr.io/caby-io/caby-service:%CABY_VERSION%
            restart: unless-stopped
            ports:
              - "8080:8080"
@@ -58,7 +58,7 @@ Before starting, ensure that you have:
 
          # frontend service
          caby-web:
-           image: ghcr.io/caby-io/caby-web:0.1.0
+           image: ghcr.io/caby-io/caby-web:%CABY_VERSION%
            restart: unless-stopped
            ports:
              - "3000:3000"
@@ -74,7 +74,7 @@ Before starting, ensure that you have:
        services:
          # backend service
          caby-service:
-           image: ghcr.io/caby-io/caby-service:0.1.0
+           image: ghcr.io/caby-io/caby-service:%CABY_VERSION%
            restart: unless-stopped
            ports:
              - "8080:8080"
@@ -91,7 +91,7 @@ Before starting, ensure that you have:
 
          # frontend service
          caby-web:
-           image: ghcr.io/caby-io/caby-web:0.1.0
+           image: ghcr.io/caby-io/caby-web:%CABY_VERSION%
            restart: unless-stopped
            ports:
              - "3000:3000"
@@ -260,7 +260,7 @@ Before starting, ensure that you have:
        -v cabynet:/app/cabynet \
        -v "$(pwd)/config.yaml:/app/cabynet/config.yaml:ro" \
        --restart unless-stopped \
-       ghcr.io/caby-io/caby-service:0.1.0
+       ghcr.io/caby-io/caby-service:%CABY_VERSION%
      ```
 
   6. Run the frontend service in the background:
@@ -271,7 +271,7 @@ Before starting, ensure that you have:
        -p 3000:3000 \
        -e PUBLIC_API_BASE=http://localhost:8080/v0 \
        --restart unless-stopped \
-       ghcr.io/caby-io/caby-web:0.1.0
+       ghcr.io/caby-io/caby-web:%CABY_VERSION%
      ```
 
   7. Watch the services come up:
@@ -291,17 +291,17 @@ Below are the most commonly overridden values for Docker setups. For everything 
 
 ### Backend (`caby-service`)
 
-| Setting      | Default                                     | Description                                                                |
-| ------------ | ------------------------------------------- | -------------------------------------------------------------------------- |
-| Image        | `ghcr.io/caby-io/caby-service:0.1.0`        | The backend service image and tag. Set to `edge` for the latest dev build. |
-| Port         | `8080`                                      | Serves the API, versioned under `/v0`.                                     |
-| Data volume  | `cabynet:/app/cabynet`                      | Everything Caby stores: files, users, and shares.                          |
-| Config mount | `./config.yaml:/app/cabynet/config.yaml:ro` | The main config. Caby only needs read access to it.                        |
+| Setting      | Default                                       | Description                                                                |
+| ------------ | --------------------------------------------- | -------------------------------------------------------------------------- |
+| Image        | `ghcr.io/caby-io/caby-service:%CABY_VERSION%` | The backend service image and tag. Set to `edge` for the latest dev build. |
+| Port         | `8080`                                        | Serves the API, versioned under `/v0`.                                     |
+| Data volume  | `cabynet:/app/cabynet`                        | Everything Caby stores: files, users, and shares.                          |
+| Config mount | `./config.yaml:/app/cabynet/config.yaml:ro`   | The main config. Caby only needs read access to it.                        |
 
 ### Frontend (`caby-web`)
 
-| Setting           | Default                          | Description                                                                                     |
-| ----------------- | -------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Image             | `ghcr.io/caby-io/caby-web:0.1.0` | The frontend web app image and tag. Should always match the backend tag.                        |
-| `PORT`            | `3000`                           | The port the frontend web app listens on.                                                       |
-| `PUBLIC_API_BASE` | `http://localhost:8080/v0`       | The API URL **as the browser reaches it**. Must include the API version, unlike `urls.backend`. |
+| Setting           | Default                                   | Description                                                                                     |
+| ----------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Image             | `ghcr.io/caby-io/caby-web:%CABY_VERSION%` | The frontend web app image and tag. Should always match the backend tag.                        |
+| `PORT`            | `3000`                                    | The port the frontend web app listens on.                                                       |
+| `PUBLIC_API_BASE` | `http://localhost:8080/v0`                | The API URL **as the browser reaches it**. Must include the API version, unlike `urls.backend`. |
